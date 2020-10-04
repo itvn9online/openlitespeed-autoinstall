@@ -1,14 +1,19 @@
 #!/bin/bash
 
+# function
+GITR_wget_to_copy() {
+yes | cp -rf $2 $1
+}
+
 # Random Password Generator
 passrootmysql=`date |md5sum |cut -c '1-15'`
 ROOTSQLPWD=$passrootmysql
 PMABLOWFISH=`date |md5sum |cut -c '1-32'`;
 
 # Define short code
-GITRAW=https://raw.githubusercontent.com/tujuhion/openlitespeed-centos-autoinstall/master
+#GITRAW=https://raw.githubusercontent.com/tujuhion/openlitespeed-centos-autoinstall/master
 LSWSDIR=/usr/local/lsws
-GITCLONE=/opt/echbayols
+GITRAW=/opt/echbayols
 mainsite="echbayols.demo"
 
 
@@ -161,26 +166,34 @@ mv -f $LSWSDIR/conf/vhosts/Example/ $LSWSDIR/conf/vhosts/echbayols.demo/
 rm -f $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf
 rm -f $LSWSDIR/conf/httpd_config.conf
 rm -f $LSWSDIR/admin/conf/admin_config.conf
-wget -O $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf $GITRAW/conf/vhconf.conf
-wget -O $LSWSDIR/conf/httpd_config.conf $GITRAW/conf/httpd_config.conf
-wget -O $LSWSDIR/admin/conf/admin_config.conf $GITRAW/conf/admin_config.conf
+#wget -O $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf $GITRAW/conf/vhconf.conf
+GITR_wget_to_copy $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf $GITRAW/conf/vhconf.conf
+#wget -O $LSWSDIR/conf/httpd_config.conf $GITRAW/conf/httpd_config.conf
+GITR_wget_to_copy $LSWSDIR/conf/httpd_config.conf $GITRAW/conf/httpd_config.conf
+#wget -O $LSWSDIR/admin/conf/admin_config.conf $GITRAW/conf/admin_config.conf
+GITR_wget_to_copy $LSWSDIR/admin/conf/admin_config.conf $GITRAW/conf/admin_config.conf
 chown lsadm:lsadm $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf
 chown lsadm:lsadm $LSWSDIR/conf/httpd_config.conf
 chown lsadm:lsadm $LSWSDIR/admin/conf/admin_config.conf
 
+
 # Copy Script
-mkdir /scripts
-wget -O /scripts/lscreate $GITRAW/scripts/lscreate
-wget -O /scripts/lsremove $GITRAW/scripts/lsremove
-wget -O /scripts/certbot $GITRAW/scripts/certbot
-wget -O /scripts/createdb $GITRAW/scripts/createdb
-wget -O /usr/bin/lsws $GITRAW/scripts/lsws
-chmod +x /usr/bin/lsws
-chmod +x /scripts/*
+#mkdir /scripts
+#wget -O /scripts/lscreate $GITRAW/scripts/lscreate
+#wget -O /scripts/lsremove $GITRAW/scripts/lsremove
+#wget -O /scripts/certbot $GITRAW/scripts/certbot
+#wget -O /scripts/createdb $GITRAW/scripts/createdb
+#wget -O /usr/bin/lsws $GITRAW/scripts/lsws
+#chmod +x /usr/bin/lsws
+#chmod +x /scripts/*
+
 
 #Copy Templates
-wget -O $LSWSDIR/conf/templates/incl.conf $GITRAW/templates/incl.conf
-wget -O $LSWSDIR/conf/templates/vhconf.conf $GITRAW/templates/vhconf.conf
+#wget -O $LSWSDIR/conf/templates/incl.conf $GITRAW/templates/incl.conf
+GITR_wget_to_copy $LSWSDIR/conf/templates/incl.conf $GITRAW/templates/incl.conf
+#wget -O $LSWSDIR/conf/templates/vhconf.conf $GITRAW/templates/vhconf.conf
+GITR_wget_to_copy $LSWSDIR/conf/templates/vhconf.conf $GITRAW/templates/vhconf.conf
+
 
 # Create Content in Homedir and logs
 touch /home/echbayols.demo/html/.htaccess
@@ -199,7 +212,10 @@ mkdir $LSWSDIR/conf/vhosts/pma
 mkdir $LSWSDIR/conf/cert/pma
 touch $LSWSDIR/pma/logs/error.log
 touch $LSWSDIR/pma/logs/access.log
-wget -O $LSWSDIR/conf/vhosts/pma/vhconf.conf $GITRAW/conf/pma_vhconf.conf
+
+#wget -O $LSWSDIR/conf/vhosts/pma/vhconf.conf $GITRAW/conf/pma_vhconf.conf
+GITR_wget_to_copy $LSWSDIR/conf/vhosts/pma/vhconf.conf $GITRAW/conf/pma_vhconf.conf
+
 wget --no-check-certificate -O $LSWSDIR/pma/html/pma.tar.gz https://files.phpmyadmin.net/phpMyAdmin/${phpmyadmin_version}/phpMyAdmin-${phpmyadmin_version}-english.tar.gz
 cd $LSWSDIR/pma/html/
 tar -xzvf pma.tar.gz
