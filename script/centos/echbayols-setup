@@ -392,6 +392,7 @@ cat > "/home/echbayols.conf" <<END
 mainsite="$mainsite"
 priport="$svport"
 serverip="$svip"
+mariadbpass="$passrootmysql"
 END
 
 
