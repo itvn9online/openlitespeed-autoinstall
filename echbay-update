@@ -24,7 +24,7 @@ fi
 rm -rf /etc/echbay/.tmp/echbay-update-*
 
 
-wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/echbay-free/master/script/echbay/echbay-update-run -O /etc/echbay/.tmp/echbay-update-run
+wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/echbay-update-run -O /etc/echbay/.tmp/echbay-update-run
 chmod +x /etc/echbay/.tmp/echbay-update-run
 bash /etc/echbay/.tmp/echbay-update-run
 

@@ -3,43 +3,39 @@
 
 # copy code tu file install sang
 cd ~
-wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/vpssim-free/master/script/vpssim/menu/git-clone
+wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/menu/git-clone
 chmod +x /root/git-clone
 bash /root/git-clone
 
 
-# BEGIN update ECHBAY-VPSSIM main
+# BEGIN update ECHBAY-OLS main
 #rm -rf /etc/motd
-yes | cp -rf /opt/echbay_vpssim/script/vpssim/motd /etc/motd
+yes | cp -rf /opt/echbayols/motd /etc/motd
 
-yes | cp -rf /opt/echbay_vpssim/script/vpssim/calc /bin/calc && chmod +x /bin/calc
+yes | cp -rf /opt/echbayols/calc /bin/calc && chmod +x /bin/calc
 
-yes | cp -rf /opt/echbay_vpssim/script/vpssim/vpssim /bin/vpssim && chmod +x /bin/vpssim
-# BEGIN update ECHBAY-VPSSIM main
-
-
-rm -rf /home/vpssim.demo/errorpage_html/*
-yes | cp -rf /opt/echbay_vpssim/script/vpssim/errorpage_html/. /home/vpssim.demo/errorpage_html/
+yes | cp -rf /opt/echbayols/echbay /bin/echbay && chmod +x /bin/echbay
+# BEGIN update ECHBAY-OLS main
 
 
-# BEGIN update ECHBAY-VPSSIM menu
-rm -rf /etc/vpssim/menu/*
-yes | cp -rf /opt/echbay_vpssim/script/vpssim/menu/. /etc/vpssim/menu/
+# BEGIN update ECHBAY-OLS menu
+rm -rf /etc/echbay/menu/*
+yes | cp -rf /opt/echbayols/menu/. /etc/echbay/menu/
 
 # Chmod 755 Menu
-/opt/echbay_vpssim/script/vpssim/menu/chmod-755-menu
-# END update ECHBAY-VPSSIM menu
+/opt/echbayols/menu/chmod-755-menu
+# END update ECHBAY-OLS menu
 
 
 # confirm done update
-yes | cp -rf /opt/echbay_vpssim/version /etc/vpssim/vpssim.version
+yes | cp -rf /opt/echbayols/version /etc/echbay/echbay.version
 
 
-#rm -rf /opt/echbay_vpssim/*
-#rm -rf /opt/echbay_vpssim
+#rm -rf /opt/echbayols/*
+#rm -rf /opt/echbayols
 sleep 1
 
 
-/etc/vpssim/menu/vpssim-update-upgrade-service-menu
+/etc/echbay/menu/update-upgrade-service-menu
 
 #exit
