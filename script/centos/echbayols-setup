@@ -144,10 +144,25 @@ fi
 
 clear
 
-# Update
-echoG "Update system, please wait..."
+sed -i '/echbayolscheck/d' /root/.bash_profile
+cat >> "/root/.bash_profile" <<END
+IPechbayolscheck="\$(echo \$SSH_CONNECTION | cut -d " " -f 1)"
+timeloginechbayolscheck=\$(date +"%e %b %Y, %a %r")
+echo 'Someone has IP address '\$IPechbayolscheck' login to $svip on '\$timeloginechbayolscheck'.' | mail -s 'eMail Notifications From ECHBAY-OLS On $svip' ${echbayolsemail}
+END
+
+#
+echoG "Install certbot, mail..."
 yum -y install epel-release
 yum -y install certbot openssl
+sudo yum -y install sendmail sendmail-cf m4
+systemctl start sendmail.service
+systemctl enable sendmail.service
+
+sudo yum -y install exim syslog-ng cronie cronie-anacron
+
+# Update
+echoG "Update system, please wait..."
 #wget -O /etc/yum.repos.d/MariaDB.repo $GITRAW/repo/MariaDB.repo
 cat > "/etc/yum.repos.d/mariadb.repo" <<END
 # MariaDB $phienbanmariadb CentOS repository list 
