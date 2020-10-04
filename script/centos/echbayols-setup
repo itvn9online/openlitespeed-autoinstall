@@ -417,11 +417,11 @@ cat >> "/home/ECHBAY-manage-info.txt" <<END
 + Lenh goi ECHBAY-OLS: echbay
 
 + Link phpMyAdmin: http://$svip:$phpmyadminport
-MySQL root Password: $passrootmysql
+--- MySQL root Password: $passrootmysql
 
 + Open LiteSpeed control panel: http://$svip:$svport
-Username: $usernamebv  
-Password: $matkhaubv 
+--- Username: $usernamebv  
+--- Password: $matkhaubv 
 
 Chuc ban se thanh cong cung ECHBAY-OLS.
 
@@ -435,17 +435,16 @@ echo -e 'Subject: ECHBAY-OLS - Chuc mung cai dat thanh cong $svip!
 
 Chao ban!
 
-Chuc mung ban da hoan thanh qua trinh cai dat va cau hinh server $svip bang ECHBAY-OLS.
-Sau day la thong tin quan ly server cua ban:
+Chuc mung ban da hoan thanh qua trinh cai dat va cau hinh server $svip bang ECHBAY-OLS. Sau day la thong tin quan ly server cua ban:
 
 + Lenh goi ECHBAY-OLS: echbay
 
 + Link phpMyAdmin: http://$svip:$phpmyadminport
-MySQL root Password: $passrootmysql
+--- MySQL root Password: $passrootmysql
 
 + Open LiteSpeed control panel: http://$svip:$svport
-Username: $usernamebv  
-Password: $matkhaubv 
+--- Username: $usernamebv  
+--- Password: $matkhaubv 
   
 ECHBAY-OLS by Dao Quoc Dai - https://echbay.com' | exim  $echbayolsemail
 END

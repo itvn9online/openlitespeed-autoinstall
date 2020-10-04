@@ -1,0 +1,12 @@
+#!/bin/sh
+. /home/echbayols.conf
+
+if [ ! -f /home/DBinfo.txt ]; then
+echo "========================================================================="  > /home/DBinfo.txt
+echo "THONG TIN DATABASE TREN VPS"  >> /home/DBinfo.txt
+echo "========================================================================="  >> /home/DBinfo.txt
+echo "" >> /home/DBinfo.txt
+echo "" >> /home/DBinfo.txt
+fi
+
+/etc/echbay/menu/them-website-menu

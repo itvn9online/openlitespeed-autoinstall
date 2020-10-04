@@ -61,3 +61,6 @@ echo "Homedir      : $HOMEDIR"
 echo "FTP User     : $USERNAME"
 echo "FTP Password : $PASSWORD"
 echo =================================================
+
+/etc/echbay/menu/them-website-menu
+

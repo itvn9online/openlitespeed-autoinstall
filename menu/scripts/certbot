@@ -1,16 +1,40 @@
 #!/bin/bash
+. /home/echbayols.conf
 
 echo "Make sure you create vhost with /scripts/lscreate."
-echo "Make your domain is correct pointing to this IP server."
+echo "Make your domain is correct pointing to this IP: $serverip"
 echo "Domain name (Without www):"
 read DOMAIN
 
-HOMEDIR="/home/$DOMAIN/html"
-/usr/bin/certbot certonly --webroot -w $HOMEDIR -d $DOMAIN -d www.$DOMAIN
+echo "--------------------------------------------------------------------------"
 
-if [ ! -f /etc/letsencrypt/live/$DOMAIN/cert.pem ]
-then
-    echo Certificate file not found, aborting installation.
+HOMEDIR="/home/$DOMAIN/html"
+
+check_domain_ip=$(ping -c 2 $DOMAIN | head -2 | tail -1 | awk '{print $5}' | sed 's/[(:)]//g')
+echo $DOMAIN" IP: "$check_domain_ip
+check_www_domain_ip=$(ping -c 2 www.$DOMAIN | head -2 | tail -1 | awk '{print $5}' | sed 's/[(:)]//g')
+echo "www."$DOMAIN" IP: "$check_www_domain_ip
+
+if [ "$check_domain_ip" == "$serverip" ] && [ "$check_www_domain_ip" == "$serverip" ]; then
+echo "SSL for: "$DOMAIN" and www."$DOMAIN
+/usr/bin/certbot certonly --webroot -w $HOMEDIR -d $DOMAIN -d www.$DOMAIN
+elif [ "$check_domain_ip" == "$serverip" ]; then
+echo "SSL for: "$DOMAIN
+/usr/bin/certbot certonly --webroot -w $HOMEDIR -d $DOMAIN
+elif [ "$check_www_domain_ip" == "$serverip" ]; then
+echo "SSL for: www."$DOMAIN
+/usr/bin/certbot certonly --webroot -w $HOMEDIR -d www.$DOMAIN
+else
+echo "Make your domain is correct pointing to this IP: $serverip"
+/etc/echbay/menu/scripts/certbot
+exit
+fi
+
+# test
+#exit
+
+if [ ! -f /etc/letsencrypt/live/$DOMAIN/cert.pem ]; then
+echo "Certificate file not found, aborting installation."
 else
 # Creating symlink Certificate File
 ln -s /etc/letsencrypt/live/$DOMAIN/privkey.pem /usr/local/lsws/conf/cert/$DOMAIN/privkey.pem
@@ -25,3 +49,5 @@ echo "================================ SUCESS ================================"
 echo "Let's Encrypt free SSL/TLS Certificates successfully Installed to $DOMAIN"
 echo "========================================================================"
 fi
+
+/etc/echbay/menu/them-website-menu
