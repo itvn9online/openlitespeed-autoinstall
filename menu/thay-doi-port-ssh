@@ -1,0 +1,148 @@
+#!/bin/bash
+. /home/echbayols.conf
+sshPortdefault=$((grep "Port" /etc/ssh/sshd_config) | head -n 1)
+portcu=$(cat /etc/ssh/sshd_config | grep Port | awk 'END {print $2}')
+if [ ! "$sshPortdefault" == "#Port 22" ]; then
+clear
+echo "-------------------------------------------------------------------------"
+echo "Not detected SSH port change by ECHBAY-OLS"
+#echo "Chuc nang nay khong the hoat dong duoc !"
+/etc/echbay/menu/tien-ich
+exit
+fi
+if [[ ${portcu} =~ ^[0-9]+$ ]] ; then
+echo "========================================================================="
+echo "Current Port SSH: $portcu"
+fi
+
+#read -r -p "Would you like to change the ssh port? [Y/N] " response
+echo "========================================================================="
+if [[ ! ${portcu} =~ ^[0-9]+$ ]] ; then
+echo "Default SSH Port: 22"
+echo "-------------------------------------------------------------------------"
+fi
+
+echo "Using this function for change SSH port"
+echo "-------------------------------------------------------------------------"
+read -r -p "You are want continue change SSH port? [Y/N] " response
+
+case $response in
+[yY][eE][sS]|[yY]) 
+echo "-------------------------------------------------------------------------"
+echo "New SSH Port != $priport and between (30000 - 50000)"
+echo "-------------------------------------------------------------------------"
+echo -n "Enter new SSH port [ENTER]: " 
+read sshport
+if [[ ! ${sshport} =~ ^[0-9]+$ ]] ; then 
+clear
+echo "========================================================================="
+echo "SSH Port: ${sshport} using number only."
+echo "-------------------------------------------------------------------------"
+echo "Please retry!" 
+/etc/echbay/menu/thay-doi-port-ssh
+exit
+fi
+if ! [[ $sshport -ge 30000 && $sshport -le 50000  ]] ; then 
+clear
+echo "========================================================================="
+#echo "Port ban nhap: ${sshport} khong hop le."
+#echo "-------------------------------------------------------------------------"
+echo "New SSH Port != $priport and between (30000 - 50000)"
+/etc/echbay/menu/thay-doi-port-ssh
+exit
+fi
+
+if [ "$priport" = "$sshport" ]; then
+clear
+echo "========================================================================="
+#echo "Port SSH ban muon thay trung voi port phpmyadmin !"
+#echo "-------------------------------------------------------------------------"
+echo "ERROR! New SSH Port != $priport or not between (30000 - 50000)"
+/etc/echbay/menu/thay-doi-port-ssh
+exit
+fi 
+
+if [ "$phpadport" = "$sshport" ]; then
+clear
+echo "========================================================================="
+#echo "Port SSH ban muon thay trung voi port phpmyadmin !"
+#echo "-------------------------------------------------------------------------"
+echo "ERROR! New SSH Port != $phpadport or not between (30000 - 50000)"
+/etc/echbay/menu/thay-doi-port-ssh
+exit
+fi 
+
+if [ "$portcu" = "$sshport" ]; then
+clear
+echo "========================================================================="
+echo "ERROR! New SSH port == current SSH port!"
+#echo "-------------------------------------------------------------------------"
+#echo "Ban hay lam lai"
+/etc/echbay/menu/thay-doi-port-ssh
+exit
+fi 
+
+if [[ ! ${portcu} =~ ^[0-9]+$ ]] ; then
+echo "Port $sshport" >> /etc/ssh/sshd_config
+echo "-------------------------------------------------------------------------"
+echo "please wait...";
+sleep 1
+
+#iptables -I INPUT -p tcp --dport $sshport -j ACCEPT
+#service iptables save
+#systemctl restart iptables.service
+firewall-cmd --zone=public --permanent --add-port=${sshport}/tcp
+firewall-cmd --reload
+/bin/systemctl restart sshd.service
+
+clear
+echo "========================================================================="
+echo "Change SSH port complete ! New Port SSH: $sshport"
+echo "-------------------------------------------------------------------------"
+echo "Command script for SSH login:"
+echo "-------------------------------------------------------------------------"
+echo "ssh root@$serverip -p $sshport"
+echo "-------------------------------------------------------------------------"
+echo "Upload qua SFTP:"
+echo "-------------------------------------------------------------------------"
+echo "Host: sftp://$serverip, User & Pass: Root's info , Port: $sshport" 
+/etc/echbay/menu/tien-ich
+exit
+fi
+
+cat > "/tmp/changeportssh" <<END
+sed -i 's/Port $portcu/Port $sshport/g' /etc/ssh/sshd_config
+END
+chmod +x /tmp/changeportssh
+/tmp/changeportssh
+rm -rf /tmp/changeportssh
+echo "-------------------------------------------------------------------------"
+echo "please wait...";
+sleep 1
+
+#iptables -I INPUT -p tcp --dport $sshport -j ACCEPT
+#service iptables save
+#systemctl restart iptables.service
+firewall-cmd --zone=public --permanent --add-port=${sshport}/tcp
+firewall-cmd --reload
+/bin/systemctl restart sshd.service
+
+clear
+echo "========================================================================="
+echo "Change SSH port complete ! New Port SSH: $sshport"
+echo "-------------------------------------------------------------------------"
+echo "Command script for SSH login:"
+echo "-------------------------------------------------------------------------"
+echo "ssh root@$serverip -p $sshport"
+echo "-------------------------------------------------------------------------"
+echo "Upload qua SFTP:"
+echo "-------------------------------------------------------------------------"
+echo "Host: sftp://$serverip, User & Pass: Root's info , Port: $sshport" 
+/etc/echbay/menu/tien-ich
+esac
+
+clear
+echo "========================================================================="
+echo "Cancel change SSH Port!"
+/etc/echbay/menu/tien-ich
+

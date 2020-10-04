@@ -391,6 +391,7 @@ rm -f /home/echbayols.conf
 cat > "/home/echbayols.conf" <<END
 mainsite="$mainsite"
 priport="$svport"
+phpadport="$phpmyadminport"
 serverip="$svip"
 mariadbpass="$passrootmysql"
 END
