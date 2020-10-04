@@ -243,7 +243,7 @@ install_multi_PHP_version () {
 	fi
 }
 #install_multi_PHP_version "71"
-#install_multi_PHP_version "72"
+install_multi_PHP_version "72"
 #install_multi_PHP_version "73"
 #install_multi_PHP_version "74"
 
@@ -690,6 +690,7 @@ mainsite="$mainsite"
 serverip="$svip"
 emailmanage="$echbayolsemail"
 mariadbuser="root"
+mariadbpass="$passrootmysql"
 END
 
 cat > "/etc/echbayols/phpmyadmin.version" <<END
@@ -769,7 +770,7 @@ touch $LSWSDIR/pma/logs/access.log
 yes | cp -rf $GITCLONE/conf/pma_vhconf.conf $LSWSDIR/conf/vhosts/pma/vhconf.conf
 wget --no-check-certificate -O $LSWSDIR/pma/html/pma.tar.gz https://files.phpmyadmin.net/phpMyAdmin/${phpmyadmin_version}/phpMyAdmin-${phpmyadmin_version}-english.tar.gz
 cd $LSWSDIR/pma/html/
-tar -xzvf pma.tar.gz
+tar -xzvf pma.tar.gz > /dev/null 2>&1
 mv phpMyAdmin-${phpmyadmin_version}-english/* ./
 #wget -O config.inc.php $GITRAW/conf/config.inc.php
 #sed -i "s/#BLOWFISH#/$PMABLOWFISH/g" config.inc.php

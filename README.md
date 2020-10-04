@@ -5,9 +5,6 @@
 ### Command install ECHBAY-OLS on Cent OS 7 & 8:
 ```
 bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install )
-curl https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install -o install && sh install
-curl -sO https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install && bash install
-curl -sO https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install && bash install
 ```
 > Copy and Paste this line in your fresh install Cent OS 7 or Cent OS 8
 
