@@ -11,9 +11,9 @@ if [ -f /var/cpanel/cpanel.config ]; then
 detected_control="WHM/Cpanel"
 elif [ -f /etc/psa/.psa.shadow ]; then
 detected_control="Plesk"
-if [ -f /etc/init.d/directadmin ]; then
+elif [ -f /etc/init.d/directadmin ]; then
 detected_control="DirectAdmin"
-if [ -f /etc/init.d/webmin ]; then
+elif [ -f /etc/init.d/webmin ]; then
 detected_control="WebMin"
 elif [ -f /home/echbayols.conf ]; then
 detected_control="ECHBAY-OLS"

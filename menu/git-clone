@@ -11,7 +11,7 @@ sudo yum -y install git
 
 # update code
 if [ -d /opt/echbayols ]; then
-cd ~ ; cd /opt/echbay_vpssim && git pull ; cd ~
+cd ~ ; cd /opt/echbayols && git pull ; cd ~
 #git commit -m "ECHBAY-VPSSIM commit"
 #git pull origin master
 #git pull origin
