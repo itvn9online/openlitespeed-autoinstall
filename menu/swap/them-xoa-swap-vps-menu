@@ -1,0 +1,30 @@
+#!/bin/bash
+
+prompt="Nhap lua chon cua ban:"
+options=("Swap 512 MB" "Swap 1 GB" "Swap 2 GB" "Swap 3 GB" "Swap 4 GB" "Swap 6 GB" "Xoa Swap" )
+
+/etc/echbay/menu/text-header
+
+printf "                             Tao & Xoa Swap\n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}"; do 
+
+case "$REPLY" in
+
+1 ) /etc/echbay/menu/swap/create-swap-512;;
+2 ) /etc/echbay/menu/swap/create-swap-1024;;
+3 ) /etc/echbay/menu/swap/create-swap-2048;;
+4 ) /etc/echbay/menu/swap/create-swap-3072;;
+5 ) /etc/echbay/menu/swap/create-swap-4096;;
+6 ) /etc/echbay/menu/swap/create-swap-6144;;
+7 ) /etc/echbay/menu/swap/xoa-swap-vps;;
+
+0 ) echo "BYE!";  clear && /bin/echbay;;
+#$(( ${#options[@]}+1 )) ) echo "BYE!";  clear && /bin/echbay;;
+*) echo "Ban nhap sai, vui long nhap cac so trong list tren";continue;;
+
+esac
+
+done

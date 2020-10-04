@@ -1,0 +1,111 @@
+#!/bin/bash
+
+. /home/echbay.conf
+
+if [ ! -f /etc/echbay/echbayols.version ]; then
+clear
+echo "========================================================================="
+echo "So sorry! We are not check current your version!"
+echo "-------------------------------------------------------------------------"
+echo "Please check script in website: https://github.com/itvn9online/openlitespeed-autoinstall"
+#echbay
+/etc/echbay/menu/update-upgrade-service-menu
+exit
+fi
+
+maximumsize=10
+rm -rf /etc/echbay/echbayols.newversion
+cd /etc/echbay
+timeout 3 wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/version -O /etc/echbay/echbayols.newversion
+
+cd
+if [ -f /etc/echbay/echbayols.newversion ]; then
+checksizeversion=$(du -sb /etc/echbay/echbayols.newversion | awk 'NR==1 {print $1}')
+if [ "$checksizeversion" == "0" ];then
+rm -rf /etc/echbay/echbayols.newversion
+fi
+if [ $checksizeversion -gt $maximumsize ]; then
+rm -rf /etc/echbay/echbayols.newversion
+fi
+fi
+
+if [ ! -f /etc/echbay/echbayols.newversion ]; then
+clear
+printf "=========================================================================\n"
+echo "So sorry! We are not check new ECHBAY-OLS version!"
+echo "-------------------------------------------------------------------------"
+echo "Please retry"
+/etc/echbay/menu/update-upgrade-service-menu
+else
+LOCALVER=`cat /etc/echbay/echbayols.version`
+REMOVER=`cat /etc/echbay/echbayols.newversion`
+fi
+
+
+chuaCoBanMoi="n"
+if [ "$LOCALVER" == "$REMOVER" ]; then
+clear
+rm -rf /etc/echbay/echbayols.newversion
+echo "========================================================================="
+echo "You are using ECHBAY-OLS latest version - Phien ban: $LOCALVER"
+echo "-------------------------------------------------------------------------"
+echo "View ECHBAY-OLS update Log on: https://github.com/itvn9online/openlitespeed-autoinstall"
+
+echo -n "You want re-update ECHBAY-OLS? [y/N] "
+read vanCapNhat
+if [ "$vanCapNhat" = "y" ]; then
+echo "OK sir! waiting update running..."
+sleep 2
+chuaCoBanMoi="y"
+else
+/etc/echbay/menu/update-upgrade-service-menu
+exit
+fi
+fi
+
+printf "=========================================================================\n"
+echo "View ECHBAY-OLS update Log on: https://github.com/itvn9online/openlitespeed-autoinstall"
+printf "=========================================================================\n"
+#printf "Da phat hien update cho ECHBAY-OLS\n"
+#echo "-------------------------------------------------------------------------"
+printf "ECHBAY-OLS current version: $LOCALVER\n"
+echo "-------------------------------------------------------------------------"
+printf "ECHBAY-OLS new version: $REMOVER\n"
+printf "=========================================================================\n"
+
+if [ "$chuaCoBanMoi" = "y" ]; then
+response="y"
+else
+read -r -p "Confirm continue update ECHBAY-OLS ? [y/N] " response
+fi
+
+case $response in
+[yY][eE][sS]|[yY])
+echo "-------------------------------------------------------------------------" 
+echo "Begin update ECHBAY-OLS..... "
+sleep 1
+
+rm -rf /etc/echbay/echbay-update
+wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/echbay-free/master/script/echbay/echbay-update -O /etc/echbay/echbay-update
+chmod +x /etc/echbay/echbay-update
+bash /etc/echbay/echbay-update
+
+exit
+
+;;
+*)
+clear
+
+printf "=========================================================================\n"
+echo "Ban da huy bo update ECHBAY-OLS"
+/etc/echbay/menu/echbay-update-upgrade-service-menu
+;;
+esac
+
+clear && /etc/echbay/menu/echbay-update-upgrade-service-menu
+
+
+
+
+
+

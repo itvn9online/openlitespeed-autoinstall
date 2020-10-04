@@ -8,6 +8,15 @@ bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-auto
 ```
 > Copy and Paste this line in your fresh install Cent OS 7 or Cent OS 8
 
+This scripts will install 
+- Open Lite Speed web server
+- ProFTPD
+- MariaDB 10.2
+- PHP 7.2
+- PHPMyAdmin 4.9.5
+- Simple Scripts to start|stop|restart|reload openlitespeed web server
+- Simple Scripts to create vhost
+
 ----------------------------------------------
 
 ### OS recommended:

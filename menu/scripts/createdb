@@ -5,13 +5,107 @@ echo "Please note, this scripts only work if you not change default root mysql p
 echo "If you change MySQL root password, make sure it stored in /root/.MariaDB"
 echo "====================================================================================="
 
-echo "Database Name :"
+echo "Database Name:"
 read DBNAME
-echo "Database Username :"
+
+DBNAME=`echo $DBNAME | tr '[A-Z]' '[a-z]'`
+if [ "$DBNAME" = "" ]; then
+clear
+echo "========================================================================="
+echo "Please enter your database name and retry!"
+/etc/echbay/menu/scripts/createdb
+exit
+fi
+if [[ $DBNAME =~ ^[0-9]+$ ]]; then
+clear
+echo "========================================================================="
+echo "Database name ERROR! not using number only!"
+/etc/echbay/menu/scripts/createdb
+exit
+fi
+
+if [[ ${#DBNAME} -ge 16 ]]; then
+clear
+echo "========================================================================="
+echo "Maximum character for database name: 16"
+/etc/echbay/menu/scripts/createdb
+exit
+fi
+
+kiemtradata="^[a-zA-Z0-9_][-a-zA-Z0-9_]{0,61}[a-zA-Z0-9_]$";
+if [[ ! "$DBNAME" =~ $kiemtradata ]]; then
+clear
+echo "========================================================================="
+echo "Database name only using: a-z or A-Z and 0-9"
+/etc/echbay/menu/scripts/createdb
+exit
+fi
+
+if [[ ! ${#DBNAME} -ge 5 ]]; then
+clear
+echo "========================================================================="
+echo "Minimum character for database name: 5"
+/etc/echbay/menu/scripts/createdb
+exit
+fi
+
+if [ -f /var/lib/mysql/$DBNAME/db.opt ]; then
+clear
+echo "========================================================================="
+echo "Data $DBNAME exist on server."
+/etc/echbay/menu/scripts/createdb
+exit
+fi
+
+
+echo "Database Username (empty for using $DBNAME):"
 read DBUSER
-echo "Database Password :"
+DBUSER=`echo $DBUSER | tr '[A-Z]' '[a-z]' | cut -c1-16`
+if [ "$DBUSER" = "" ]; then
+DBUSER=$DBNAME
+fi
+
+echo "Database Password (6-16 character or empty for auto create):"
 read DBPASS
+if [ "$DBPASS" = "" ]; then
+DBPASS=`date |md5sum |cut -c '6-16'`
+elif ! [[ ${#DBPASS} -ge 6 && ${#DBPASS} -le 16  ]] ; then
+clear
+echo "========================================================================="
+echo "Password length: 6-16 character"
+/etc/echbay/menu/scripts/createdb
+exit
+fi
 
 MYSQLROOTPASS=`/usr/bin/cat /root/.MariaDB`
 
 mysql -u root -p$MYSQLROOTPASS -v -e "create database $DBNAME;grant all on $DBNAME.* to $DBUSER@localhost identified by '$DBPASS'"
+
+if [ ! -f /var/lib/mysql/$DBNAME/db.opt ]; then
+clear
+echo "========================================================================="
+echo "Can't create Database $DBNAME!"
+echo "-------------------------------------------------------------------------"
+echo "Please re-check MySQL service"
+/etc/echbay/menu/scripts/createdb
+exit
+else
+echo "================================================="
+echo "Done!"
+echo "Your Database $DBNAME is ready"
+echo "Database name       : $DBNAME"
+echo "Database user       : $DBUSER"
+echo "Database Password   : $DBPASS"
+echo "Database info save in: /home/DBinfo.txt"
+echo "================================================="
+
+echo "=========================================================================" >> /home/DBinfo.txt
+echo "Database: $DBNAME - Created on: $(date +%d/%m/%Y) when add $website to VPS" >> /home/DBinfo.txt
+echo "=========================================================================" >> /home/DBinfo.txt
+echo "Data name: $DBNAME" >> /home/DBinfo.txt
+echo "Username: $DBUSER" >> /home/DBinfo.txt
+echo "Password: $DBPASS" >> /home/DBinfo.txt
+echo "" >> /home/DBinfo.txt
+fi
+
+/bin/echbay

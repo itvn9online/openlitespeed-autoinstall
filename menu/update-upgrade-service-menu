@@ -1,0 +1,34 @@
+#!/bin/bash
+
+prompt="Lua chon cua ban (0-Thoat):"
+#options=( "Update System" "Update ECHBAY-OLS" "Update Nginx" "Change phpMyAdmin Version" "Change PHP Version" "Update OpenSSL version" "Reset code form git" "List soft version" "Nginx quiche")
+options=( "Update System" "Update ECHBAY-OLS")
+
+/etc/echbay/menu/text-header
+printf "                        Update / Upgrade Service \n"
+printf "=========================================================================\n"
+
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+case "$REPLY" in
+1) /etc/echbay/menu/update-he-thong;;
+2) /etc/echbay/menu/nang-cap-scripts;;
+3) /etc/echbay/menu/nang-cap-nginx;;
+#	3) /etc/echbay/menu/echbay-befor-nang-cap-nginx;;
+4) /etc/echbay/menu/echbay-nang-cap-phpmyadmin;;
+#	5) /etc/echbay/menu/nang-cap-mariaDB/echbay-before-nang-cap-mariadb;;
+5) clear && /etc/echbay/menu/nangcap-php/echbay-updown-php;;
+#	6) clear && /etc/echbay/menu/echbay-thay-doi-ngon-ngu-menu;;
+6) clear && /etc/echbay/menu/nang-cap-openssl;;
+7) clear && /etc/echbay/menu/git-reset;;
+8) clear && /etc/echbay/menu/list-all-soft-version;;
+9) clear && /etc/echbay/menu/nginx-quiche;;
+0) clear && echbay;;
+*) echo "Ban nhap sai, vui long nhap theo so thu tu tren menu !";continue;;
+esac
+done
+
+
+

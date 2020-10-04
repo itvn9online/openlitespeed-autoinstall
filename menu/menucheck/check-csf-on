@@ -28,16 +28,16 @@ echo "Dia chi IP hien tai cua ban:  $checkip"
 echo "-------------------------------------------------------------------------"
 echo "Dia chi IP nay khong co trong whitelist cua CSF Firewwall"
 echo "-------------------------------------------------------------------------"
-echo "VPSSIM da them IP nay vao CSF whitelist de khong bi CSF Firewall Block"
+echo "ECHBAY-OLS da them IP nay vao CSF whitelist de khong bi CSF Firewall Block"
 echo "-------------------------------------------------------------------------"
 echo "De thay doi co hieu luc, CSF Firewall can khoi dong lai"
 echo "========================================================================="
-read -p "Nhan [Enter] de khoi dong lai CSF Firewall va Truy cap VPSSIM ..."
+read -p "Nhan [Enter] de khoi dong lai CSF Firewall va Truy cap ECHBAY-OLS ..."
 #iptables -I INPUT -p tcp --dport $priport -j ACCEPT
 #iptables -A INPUT -p tcp -s $checkip --dport $priport -j ACCEPT
 #service iptables save
 #service iptables restart
-/etc/echbay/menu/CSF-Fiwall/vpssim-re-start-khoi-dong-lai-csf-lfd
+/etc/echbay/menu/CSF-Fiwall/re-start-khoi-dong-lai-csf-lfd
 clear
 echo "========================================================================="
 echo "IP: $checkip da duoc them vao CSF Firewall's Whitelist"

@@ -2,10 +2,35 @@
 
 echo "Domain name (Without www):"
 read DOMAIN
-echo FTP Username :
+
+DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
+if [ "$DOMAIN" == "" ]; then
+clear
+echo "========================================================================="
+echo "Please enter your domain and retry!"
+/etc/echbay/menu/scripts/lscreate
+exit
+fi
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,12}$";
+if [[ ! "$DOMAIN" =~ $kiemtradomain3 ]]; then
+	DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$DOMAIN Domain format warning! you want continue? (y/N):"
+read tiep_tuc_add_domain
+if [ ! "$tiep_tuc_add_domain" = "y" ]; then
+/etc/echbay/menu/scripts/lscreate
+exit
+fi
+fi
+
+echo "FTP Username (empty for skip create FTP account):"
 read USERNAME
-echo FTP Password :
+if [ ! "$USERNAME" = "" ]; then
+echo "FTP Password:"
 read PASSWORD
+fi
 
 HOMEDIR="/home/$DOMAIN"
 SERVERROOT="/usr/local/lsws"
@@ -42,10 +67,14 @@ openssl req -sha256 -new -key $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.key -out $SE
 openssl x509 -req -sha256 -days 365 -in $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.csr -signkey $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.key -out $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.crt
 
 # Create FTP User
+if [ ! "$USERNAME" = "" ]; then
 useradd $USERNAME -d /home/$DOMAIN -p $(echo $PASSWORD | openssl passwd -1 -stdin) -M
+fi
 
 # Fix Permission
+if [ ! "$USERNAME" = "" ]; then
 chown -R $USERNAME:$USERNAME $HOMEDIR/html/
+fi
 chown -R lsadm:lsadm $SERVERROOT/conf/cert/
 chown -R lsadm:lsadm $SERVERROOT/conf/vhosts/
 chown -R lsadm:lsadm $SERVERROOT/conf/templates/
@@ -58,9 +87,12 @@ echo Done!
 echo Your vhost is ready
 echo "Domain       : $DOMAIN"
 echo "Homedir      : $HOMEDIR"
+if [ ! "$USERNAME" = "" ]; then
 echo "FTP User     : $USERNAME"
 echo "FTP Password : $PASSWORD"
+fi
 echo =================================================
 
-/etc/echbay/menu/them-website-menu
+#/etc/echbay/menu/them-website-menu
+/bin/echbay
 

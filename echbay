@@ -26,7 +26,9 @@ rm -rf /tmp/showthongbao
 #find /etc/echbay/menu -type f -exec chmod 755 {} \;
 prompt="Nhap lua chon cua ban:"
 #options=("Them Website & Code" "Xoa website" "Backup & Restore Code" "Quan Ly Database" "Quan Ly phpMyAdmin" "Quan Ly Zend OPcache" "Quan Ly Memcached" "Quan Ly Redis Cache" "Quan Ly FTP Server" "Quan Ly Swap" "Quan Ly Cronjob"  "Quan Ly File Log" "Config Cau Hinh PHP" "Wordpress Blog Tools" "Quan Ly CSF Firewall" "Quan Ly IPtables Firewall" "Quan Ly BitTorrent Sync" "Quan Ly VPS Backup" "Linux Malware Detect" "Cai Dat File Manager" "Cai Dat Net2FTP" "Cai Dat NetData" "Cai Dat SSL (Let's Enctypt)" "Check & Block IP DOS" "Tien ich - Addons" "Update System" "Clear All Caches" "User & Password Mac Dinh" "Server Status" "Thoat")
-options=("Add website" "Xoa website" "Backup & Restore Code" "Quan Ly Database" "Quan Ly phpMyAdmin" "Quan Ly Zend OPcache" "Quan Ly Memcached" "Quan Ly Redis Cache" "Quan Ly FTP Server" "Quan Ly Swap" "Quan Ly Cronjob"  "Quan Ly File Log" "Config Cau Hinh PHP" "Wordpress Blog Tools" "Quan Ly CSF Firewall" "Quan Ly IPtables Firewall" "Quan Ly BitTorrent Sync" "Quan Ly VPS Backup" "Linux Malware Detect" "Cai Dat File Manager" "Cai Dat Net2FTP" "Cai Dat NetData" "Cai Dat SSL (Let's Enctypt)" "Check & Block IP DOS" "Tien ich - Addons" "Update System" "Server Status")
+#options=("Add website" "Xoa website" "Backup & Restore Code" "Quan Ly Database" "Quan Ly phpMyAdmin" "Quan Ly Zend OPcache" "Quan Ly Memcached" "Quan Ly Redis Cache" "Quan Ly FTP Server" "Quan Ly Swap" "Quan Ly Cronjob"  "Quan Ly File Log" "Config Cau Hinh PHP" "Wordpress Blog Tools" "Quan Ly CSF Firewall" "Quan Ly IPtables Firewall" "Quan Ly BitTorrent Sync" "Quan Ly VPS Backup" "Linux Malware Detect" "Cai Dat File Manager" "Cai Dat Net2FTP" "Cai Dat NetData" "Cai Dat SSL (Let's Enctypt)" "Check & Block IP DOS" "Tien ich - Addons" "Update System" "Server Status")
+#options=("Add website" "Quan Ly FTP Server" "Quan Ly Swap" "Quan Ly Cronjob"  "Quan Ly File Log" "Config Cau Hinh PHP" "Wordpress Blog Tools" "Quan Ly CSF Firewall" "Quan Ly IPtables Firewall" "Quan Ly BitTorrent Sync" "Quan Ly VPS Backup" "Linux Malware Detect" "Cai Dat File Manager" "Cai Dat Net2FTP" "Cai Dat NetData" "Cai Dat SSL (Let's Enctypt)" "Check & Block IP DOS" "Tien ich - Addons" "Update System" "Server Status")
+options=("Add website" "Remove website" "Create database" "Swap" "Cronjob" "Update")
 
 echo "========================================================================="
 echo "      ECHBAY-OLS - Quan Ly VPS/Server by WebGiaRe.org ($(cat /etc/echbay/echbayols.version))                "
@@ -37,17 +39,21 @@ echo "========================================================================="
 PS3="$prompt"
 select opt in "${options[@]}" ; do
 case "$REPLY" in
-1) clear && /etc/echbay/menu/them-website-menu-befor;;
-2) /etc/echbay/menu/vpssim-befor-xoa-website;;
-3) clear && /etc/echbay/menu/vpssim-sao-luu;;
-4) clear && /etc/echbay/menu/vpssim-befor-them-xoa-database;;
-5) clear && /etc/echbay/menu/vpssim-phpmyadmin-menu;;
-6) clear && /etc/echbay/menu/opcache/vpssim-before-opcache;;
-7) clear && /etc/echbay/menu/memcache/vpssim-before-memcache-menu;;
-8) clear && /etc/echbay/menu/vpssim-redis-befor-menu;;
-9) clear &&/etc/echbay/menu/vpssim-ftpserver-menu;;
-10 )clear && /etc/echbay/menu/swap/vpssim-them-xoa-swap-vps-menu;;
-11) clear && /etc/echbay/menu/crontab/vpssim-cronjob-menu;;
+#1) clear && /etc/echbay/menu/them-website-menu-befor;;
+1) clear && /etc/echbay/menu/scripts/lscreate;;
+2) clear && /etc/echbay/menu/scripts/lsremove;;
+3) clear && /etc/echbay/menu/scripts/createdb;;
+#3) clear && /etc/echbay/menu/vpssim-sao-luu;;
+#4) clear && /etc/echbay/menu/vpssim-befor-them-xoa-database;;
+#5) clear && /etc/echbay/menu/vpssim-phpmyadmin-menu;;
+#6) clear && /etc/echbay/menu/opcache/vpssim-before-opcache;;
+#7) clear && /etc/echbay/menu/memcache/vpssim-before-memcache-menu;;
+#8) clear && /etc/echbay/menu/vpssim-redis-befor-menu;;
+#9) clear &&/etc/echbay/menu/vpssim-ftpserver-menu;;
+4) clear && /etc/echbay/menu/swap/them-xoa-swap-vps-menu;;
+5) clear && /etc/echbay/menu/crontab/cronjob-menu;;
+6) clear && /etc/echbay/menu/update-upgrade-service-menu;;
+
 12) clear && /etc/echbay/menu/vpssim-eroor-menu;;
 13) clear && /etc/echbay/menu/vpssim-befor-vpssim-config-php.ini-menu;;
 14) clear && /etc/echbay/menu/vpssim-wordpress-tools-menu;;
@@ -63,12 +69,12 @@ case "$REPLY" in
 23) clear && /etc/echbay/menu/vpssim-letsencrypt-menu;;
 24) clear && /etc/echbay/menu/vpssim-kiem-tra-ddos;;
 25) clear && /etc/echbay/menu/vpssim-tien-ich;;
-26) clear && /etc/echbay/menu/vpssim-update-upgrade-service-menu;;
 #27) /etc/echbay/menu/vpssim-clear-cache-xoa-cache-server;;
 #28) /etc/echbay/menu/dat-mat-khau-bao-ve-folder-mac-dinh;;
 29) clear && /etc/echbay/menu/vps-info;;
 #30) clear && cat /etc/motd && killall -g echbay;; 
-0) clear && cat /etc/motd && killall -g echbay;; 
+#0) clear && cat /etc/motd && killall -g echbay;; 
+0) clear && cat /etc/motd && echbay;; 
 *) echo "Ban nhap sai, vui long nhap theo so thu tu tren menu !";continue;;
 esac
 done

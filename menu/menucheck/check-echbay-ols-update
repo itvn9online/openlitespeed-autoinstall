@@ -20,20 +20,20 @@ checksize=$(du -sb /tmp/echbayols.newversion | awk 'NR==1 {print $1}')
 ###
 	if [ $checksize -gt 2 ]; then
 	REMOVER=`cat /tmp/echbayols.newversion`
-	cat >> "/tmp/vpssim_check_vpssim_version" <<END
+	cat >> "/tmp/echbay_check_echbay_version" <<END
 		if [ ! "$LOCALVER" == "$REMOVER" ]; then
 			echo "========================================================================="
-			echo "Update for VPSSIM found !  "
+			echo "Update for ECHBAY-OLS found !  "
 			echo "-------------------------------------------------------------------------"
 			echo "Your Version: $LOCALVER   |   Newest version: $REMOVER"
 			echo "-------------------------------------------------------------------------"
-			echo "How to update: VPSSIM menu => Update System => Update VPSSIM "
+			echo "How to update: ECHBAY-OLS menu => Update System => Update ECHBAY-OLS "
 			
 		fi
 END
-	chmod +x /tmp/vpssim_check_vpssim_version
-	/tmp/vpssim_check_vpssim_version
-	rm -rf /tmp/vpssim_check_vpssim_version
+	chmod +x /tmp/echbay_check_echbay_version
+	/tmp/echbay_check_echbay_version
+	rm -rf /tmp/echbay_check_echbay_version
 	fi
 fi
 

@@ -1,0 +1,31 @@
+#!/bin/sh
+prompt="Nhap lua chon cua ban (0-Thoat):"
+options=("Add Crontab" "Remove Crontab" "Remove all Crontab" "List Crontab")
+
+/etc/echbay/menu/text-header
+printf "                              Quan Ly Cronjob \n"
+echo "========================================================================="
+
+if [ ! -f /var/spool/cron/root ]; then
+printf "                             Crontab running: 0 \n"
+else
+printf "                           Crontab running: $(wc -l /var/spool/cron/root | awk '{print $1}') \n"
+fi
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+case "$REPLY" in
+
+1 ) /etc/echbay/menu/crontab/them-cronjob;;
+2 ) /etc/echbay/menu/crontab/xoa-mot-crontab;;
+3 ) /etc/echbay/menu/crontab/befor-xoa-het-cronjob;;
+4 ) /etc/echbay/menu/crontab/crontab-hien-tai;;
+0 ) clear && /bin/echbay;;
+
+*) echo "Ban nhap sai, vui long nhap theo so thu tu tren menu";continue;;
+
+esac
+done
+

@@ -3,14 +3,41 @@
 echo "Domain name (Without www):"
 read DOMAIN
 
+DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
+if [ "$DOMAIN" == "" ]; then
+clear
+echo "========================================================================="
+echo "Please enter tour domain and retry!"
+/etc/echbay/menu/scripts/lsremove
+exit
+fi
+
+kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,12}$";
+if [[ ! "$DOMAIN" =~ $kiemtradomain3 ]]; then
+	DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
+clear
+echo "========================================================================="
+echo "$DOMAIN Domain format warning! you want continue? (y/N):"
+read tiep_tuc_add_domain
+if [ ! "$tiep_tuc_add_domain" = "y" ]; then
+/etc/echbay/menu/scripts/lsremove
+exit
+fi
+fi
+
 HOMEDIR="/home/$DOMAIN"
 VHOSTDIR="/usr/local/lsws/conf/vhosts/$DOMAIN"
 CERTDIR="/usr/local/lsws/conf/cert/$DOMAIN"
 
 rm -rf $HOMEDIR && rm -rf $VHOSTDIR && rm -rf $CERTDIR
 
+# Reload
+/usr/local/lsws/bin/lswsctrl reload
+
 echo "=========================================================="
 echo "Removing $HOMEDIR"
 echo "Removing $VHOSTDIR"
 echo "Removing $CERTDIR"
 echo "For Complete process, please enter your litespeed admin, and delete your vhost."
+
+/bin/echbay
