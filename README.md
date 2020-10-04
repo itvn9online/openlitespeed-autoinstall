@@ -4,7 +4,7 @@
 ### ECHBAY-OLS: EchBay + Open Lite Speed
 ### Lệnh Cài Đặt ECHBAY-OLS Trên Centos 7 & 8:
 ```
-bash <( curl -k https://raw.githubusercontent.com/itvn9online/echbayols/main/install )
+bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install )
 ```
 
 ----------------------------------------------

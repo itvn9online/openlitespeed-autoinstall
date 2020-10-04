@@ -13,7 +13,7 @@ sudo yum -y install wget
 
 #
 cd ~
-wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/echbayols/main/menu/git-clone
+wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/menu/git-clone
 chmod +x ~/git-clone
 bash ~/git-clone
 

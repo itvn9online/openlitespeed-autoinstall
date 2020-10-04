@@ -8,7 +8,7 @@
 cd ~
 
 # Define short code
-GITRAW=https://raw.githubusercontent.com/itvn9online/echbayols/main
+GITRAW=https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main
 GITCLONE=/opt/echbayols
 LSWSDIR=/usr/local/lsws
 mainsite="echbayols.demo"
