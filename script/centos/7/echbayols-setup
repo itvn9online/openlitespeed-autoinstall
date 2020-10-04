@@ -1,0 +1,39 @@
+#!/bin/sh
+
+. /opt/echbayols/wpimgsetup
+
+#test_include
+init_check
+init_setup
+if [ ${OSNAME} = 'centos' ]; then
+#	centos_main_install
+	centos_install_basic
+	centos_install_php
+	centos_install_memcached
+	centos_install_redis
+	centos_install_certbot
+	install_phpmyadmin
+	install_wp_cli
+	landing_pg
+	
+#	centos_main_config
+	centos_config_ols
+	config_php
+	centos_config_memcached
+	centos_config_redis
+#	wp_main_config
+		config_mysql
+#		wp_config
+		db_password_file
+		update_final_permission
+		restart_lsws
+	
+	centos_firewall_add
+	centos_service_check
+else
+	ubuntu_main_install
+	ubuntu_main_config
+	ubuntu_firewall_add
+	ubuntu_service_check
+fi
+end_message

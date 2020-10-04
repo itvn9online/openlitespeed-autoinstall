@@ -1,0 +1,24 @@
+========================================================================
+* VPS (Server) duoc Cai dat va Cau hinh boi ECHBAY-OLS
+* https://github.com/itvn9online/echbayols
+========================================================================
+* Lenh goi ECHBAY-OLS menu :    echbay 
+========================================================================
+* Neu khong truy cap duoc phpMyAdmin, download backup files ...
+------------------------------------------------------------------------
+* Chay chuc nang: [Open Phpmyadmin Port] trong [Quan Ly Phpmyadmin].
+------------------------------------------------------------------------
+* Neu Server ho tro tao SWAP, ban nen su dung chuc nang [Quan ly SWAP]
+------------------------------------------------------------------------
+* de tao SWAP, nang cao hieu suat Server.
+------------------------------------------------------------------------
+* Mac dinh: CSF Firewall bi disable.
+*-----------------------------------------------------------------------
+* Neu server > 1 GB RAM ==> Ban nen Enable CSF Firewall.
+========================================================================
+* Vi cong dong ECHBAY-OLS user, hay comment neu gap loi khi su dung ECHBAY-OLS.
+*-----------------------------------------------------------------------
+* Hoi dap, chia se kinh nghiem, giup do cong dong tai dien dan:
+*-----------------------------------------------------------------------
+* https://www.facebook.com/groups/wordpresseb
+========================================================================

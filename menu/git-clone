@@ -1,0 +1,30 @@
+#!/bin/sh
+
+cd ~
+if [ -d /opt/echbayols ]; then
+rm -rf /opt/echbayols/*
+rm -rf /opt/echbayols
+sleep 5
+fi
+
+sudo yum -y install git
+
+# update code
+if [ -d /opt/echbayols ]; then
+cd ~ ; cd /opt/echbay_vpssim && git pull ; cd ~
+#git commit -m "ECHBAY-VPSSIM commit"
+#git pull origin master
+#git pull origin
+#git merge origin master
+# or clone new
+else
+git clone https://github.com/itvn9online/echbayols /opt/echbayols
+fi
+
+cd ~
+
+sleep 5
+
+find /opt/echbayols/menu -type f -exec chmod 755 {} \;
+/opt/echbayols/menu/git-clone-done
+

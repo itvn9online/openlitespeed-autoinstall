@@ -1,0 +1,913 @@
+#!/bin/sh
+
+# https://github.com/tujuhion/openlitespeed-centos-autoinstall
+# https://www.vultr.com/docs/how-to-install-openlitespeed-and-php-7-on-centos-7
+# https://thuthuatwp.com/cai-dat-openlitespeed/
+# https://openlitespeed.org/kb/phpmyadmin-on-openlitespeed/
+
+cd ~
+
+# Define short code
+GITRAW=https://raw.githubusercontent.com/itvn9online/echbayols/main
+GITCLONE=/opt/echbayols
+LSWSDIR=/usr/local/lsws
+mainsite="echbayols.demo"
+
+#
+checktruenumber='^[0-9]+$'
+
+svport=7080
+
+kiemtraemail3="^(([-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~])+\.)*[-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~]+@\w((-|\w)*\w)*\.(\w((-|\w)*\w)*\.)*\w{2,24}$";
+svip=$(wget http://ipecho.net/plain -O - -q ; echo)
+cpuname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo )
+cpucores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
+cpufreq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo )
+svram=$( free -m | awk 'NR==2 {print $2}' )
+svhdd=$( df -h | awk 'NR==2 {print $2}' )
+svswap=$( free -m | awk 'NR==4 {print $2}' )
+free -m
+df -h
+echo "=========================================================================="
+echo "Server info:"
+echo "--------------------------------------------------------------------------"
+echo "Server Type: $(virt-what | awk 'NR==1 {print $NF}')"
+echo "CPU Type: $cpuname"
+echo "CPU Core: $cpucores"
+echo "CPU Speed: $cpufreq MHz"
+echo "Memory: $svram MB"
+echo "Disk: $svhdd"
+echo "IP: $svip"
+echo "--------------------------------------------------------------------------"
+#echo "Dien Thong Tin Cai Dat: "
+
+echo "--------------------------------------------------------------------------"
+echo -n "Enter your email [ENTER]: " 
+read echbayolsemail
+if [ "$echbayolsemail" = "" ]; then
+clear
+echo "=========================================================================="
+echo "Please enter your email!"
+echo "-------------------------------------------------------------------------"
+read -p "Press [Enter] to continue..."
+clear
+bash /root/echbayols-setup
+exit
+fi
+
+echbayols_setup_cleanup_config_file () {
+# remove blank in last line
+sed -i -e "s/\s*$//" $1
+# remove blank in first line
+sed -i -e "s/^\s*//" $1
+# remove blank line
+sed -i -e "/^$/d" $1
+sed -i -e '/^\s*$/d' $1
+# remove comment line
+sed -i -e '/^\s*#.*$/d' $1
+}
+
+if [[ ! "$echbayolsemail" =~ $kiemtraemail3 ]]; then
+clear
+echo "=========================================================================="
+echo "ERROR! email format: $echbayolsemail"
+echo "--------------------------------------------------------------------------"
+read -p "Press [Enter] to continue..."
+clear
+bash /root/echbayols-setup
+exit
+fi
+
+matkhaubv=`date |md5sum |cut -c '1-6'`
+
+usernamebv=`echo "${echbayolsemail};" | sed 's/\([^@]*\)@\([^;.]*\)\.[^;]*;[ ]*/\1 \2\n/g' | awk 'NR==1 {print $1}'`
+
+mariadbversion="10.2";
+phienbanmariadb=10.2
+
+passrootmysql=`date |md5sum |cut -c '1-15'`
+ROOTSQLPWD=$passrootmysql
+
+rm -f /tmp/echbayols.conf
+cat > "/tmp/echbayols.conf" <<END
+matkhaubv="$matkhaubv"
+usernamebv="$usernamebv"
+passrootmysql="$passrootmysql"
+END
+
+echbayols_version=`cat /opt/echbayols/echbayols.newversion`
+
+
+current_os_version=$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))
+if [ "$current_os_version" == "7" ]; then
+el_version=$current_os_version
+else
+el_version="8"
+fi
+
+
+phpmyadmin_version=`cat /opt/echbayols/00-all-phpmyadmin-version.txt`
+
+
+clear
+
+echo "=========================================================================="
+echo "OS Version: "$current_os_version
+echo "--------------------------------------------------------------------------"
+echo "ECHBAY-OLS will setup Server with info:"
+echo "=========================================================================="
+echo "eMail Quan Ly: $echbayolsemail"
+echo "--------------------------------------------------------------------------"
+echo "phpMyAdmin Version: "$phpmyadmin_version
+echo "--------------------------------------------------------------------------"
+echo "MariaDB Version: $phienbanmariadb"
+echo "--------------------------------------------------------------------------"
+echo "Mat khau tai khoan root MySQL: $passrootmysql"
+echo "--------------------------------------------------------------------------"
+echo "ECHBAY-OLS Version: $echbayols_version"
+echo "=========================================================================="
+
+echo -n "Confirm continue install (y/N): " 
+read xacnhanthongtin
+
+#prompt="Nhap lua chon cua ban: "
+#options=( "Dong Y" "Khong Dong Y")
+#PS3="$prompt"
+#select opt in "${options[@]}"; do
+#case "$REPLY" in
+#1) xacnhanthongtin="dongy"; break;;
+#2) xacnhanthongtin="khongdongy"; break;;
+#*) echo "Ban nhap sai ! Ban vui long chon so trong danh sach";continue;;
+#esac  
+#done
+
+#if [ "$xacnhanthongtin" = "dongy" ]; then
+if [ "$xacnhanthongtin" = "y" ]; then
+echo "--------------------------------------------------------------------------"
+echo "Waiting install ECHBAY-OLS..."
+sleep 2
+else 
+clear
+rm -rf /root/install && bash /root/echbayols-setup
+exit
+fi
+
+
+
+
+########################################################################################
+
+sed -i '/echbayolscheck/d' /root/.bash_profile
+cat >> "/root/.bash_profile" <<END
+IPechbayolscheck="\$(echo \$SSH_CONNECTION | cut -d " " -f 1)"
+timeloginechbayolscheck=\$(date +"%e %b %Y, %a %r")
+echo 'Someone has IP address '\$IPechbayolscheck' login to $svip on '\$timeloginechbayolscheck'.' | mail -s 'eMail Notifications From ECHBAY-OLS On $svip' ${echbayolsemail}
+END
+#echo "$svport" > /tmp/priport.txt
+
+# Update
+yum -y install certbot openssl
+sudo yum -y install psmisc bc gawk gcc
+sudo yum -y -q install virt-what unzip sudo net-tools iproute iproute2 curl deltarpm yum-utils tar
+#sudo yum -y install wget unzip
+
+# Step 1: Update the system
+if [ -s /etc/selinux/config ]; then
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+fi
+
+sudo yum -y install epel-release
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-${el_version}.rpm
+if [ -f /etc/yum.repos.d/epel.repo ]; then
+sudo sed -i "s/mirrorlist=https/mirrorlist=http/" /etc/yum.repos.d/epel.repo
+fi
+
+#sudo yum clean all && sudo yum update -y && sudo shutdown -r now
+#sudo yum clean all && sudo yum -y update
+
+
+#
+#systemctl mask firewalld
+#systemctl stop firewalld
+#systemctl stop sendmail.service 
+#systemctl stop xinetd.service
+#systemctl stop saslauthd.service 
+#systemctl stop rsyslog.service 
+#systemctl stop postfix.service
+
+#systemctl disable sendmail.service
+#systemctl disable xinetd.service 
+#systemctl disable saslauthd.service 
+#systemctl disable rsyslog.service 
+#systemctl disable postfix.service
+
+#sudo yum -y remove mysql*
+#sudo yum -y remove php*
+#sudo yum -y remove httpd*
+#sudo yum -y remove sendmail*
+#sudo yum -y remove postfix*
+#sudo yum -y remove rsyslog*
+
+
+# create repo for install
+cat > "/etc/yum.repos.d/mariadb.repo" <<END
+# MariaDB $phienbanmariadb CentOS repository list 
+# http://downloads.mariadb.org/mariadb/repositories/
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/$phienbanmariadb/centos$el_version-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+END
+sudo rpm -ivh http://rpms.litespeedtech.com/centos/litespeed-repo-1.1-1.el${el_version}.noarch.rpm
+yum -y update
+
+#
+sudo yum -y install openlitespeed
+
+
+# change admin pass
+#/usr/local/lsws/admin/misc/admpass.sh
+yes | cp -rf /opt/echbayols/menu/auto_lsws_admpass /usr/local/lsws/admin/misc/auto_lsws_admpass
+chmod +x /usr/local/lsws/admin/misc/auto_lsws_admpass
+bash /usr/local/lsws/admin/misc/auto_lsws_admpass
+rm -rf /usr/local/lsws/admin/misc/auto_lsws_admpass
+
+
+
+# install PHP
+install_multi_PHP_version () {
+	if [ ! -d /usr/local/lsws/lsphp${1} ]; then
+		sudo yum -y install lsphp${1} lsphp${1}-common lsphp${1}-mysqlnd lsphp${1}-process lsphp${1}-gd lsphp${1}-mbstring lsphp${1}-mcrypt lsphp${1}-opcache lsphp${1}-bcmath lsphp${1}-pdo lsphp${1}-xml lsphp${1}-json lsphp${1}-zip lsphp${1}-xmlrpc lsphp${1}-pecl-mcrypt
+#		sudo yum -y install lsphp${1} lsphp${1}-mysqlnd lsphp${1}-common lsphp${1}-gd lsphp${1}-pdo lsphp${1}-process lsphp${1}-mbstring lsphp${1}-mcrypt lsphp${1}-opcache lsphp${1}-bcmath lsphp${1}-xml
+	fi
+}
+#install_multi_PHP_version "71"
+#install_multi_PHP_version "72"
+#install_multi_PHP_version "73"
+#install_multi_PHP_version "74"
+
+
+. /opt/echbayols/wpimgsetup
+
+
+iptables_port_list="21 25 465 587 $svport 8090"
+
+if [ "`systemctl is-active firewalld.service`" == "active" ]; then
+#	systemctl start firewalld
+
+	centos_firewall_add
+
+#	sudo firewall-cmd --zone=public --permanent --add-port=${svport}/tcp
+	for PORT in ${iptables_port_list}; do 
+		sudo firewall-cmd --zone=public --permanent --add-port=${PORT}/tcp
+	done 
+	sudo firewall-cmd --zone=public --permanent --add-service=http
+	sudo firewall-cmd --reload
+	
+	firewall-cmd --list-all | grep ${svport} > /dev/null 2>&1
+	if [ ${?} = 0 ]; then 
+		echoG 'firewalld rules setup success'
+	else 
+		echoR 'Please check firewalld rules'    
+	fi         
+else
+	
+	yum install -y iptables-services
+	if [ -f /etc/sysconfig/iptables ]; then
+#		systemctl is-active iptables.service
+#		systemctl is-active ip6tables.service
+		
+		systemctl enable iptables 
+		systemctl enable ip6tables
+		systemctl start iptables
+		systemctl start iptables.service
+		
+		for PORT in ${iptables_port_list}; do 
+			iptables -I INPUT -p tcp --dport ${PORT} -j ACCEPT
+		done 
+#		iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+#		iptables -I INPUT -p tcp --dport 22 -j ACCEPT
+#		iptables -I INPUT -p tcp --dport 21 -j ACCEPT
+#		iptables -I INPUT -p tcp --dport 25 -j ACCEPT
+#		iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+#		iptables -I INPUT -p tcp --dport 465 -j ACCEPT
+#		iptables -I INPUT -p tcp --dport 587 -j ACCEPT
+#		iptables -I INPUT -p tcp --dport $svport -j ACCEPT
+		
+		service iptables save
+		/bin/systemctl restart iptables.service
+	fi
+	
+fi
+
+
+
+################################################### MariaDB
+
+mkdir -p /usr/local/echbayols
+cd /usr/local/echbayols
+#groupadd nginx
+#useradd -g nginx -d /dev/null -s /sbin/nologin nginx
+sudo yum -y update
+sudo yum -y groupinstall "Development Tools"
+#sudo yum -y install gcc gcc-c++ pcre pcre-devel zlib zlib-devel mailx tar expect imake lsof autoconf nc ca-certificates libedit-devel make automake expat-devel perl-libwww-perl perl-Crypt-SSLeay perl-Net-SSLeay tree virt-what cmake openssl-devel net-tools systemd-devel libdb-devel libxml2-devel libxml2 libxslt-devel gd gd-devel perl-ExtUtils-Embed patch sysstat libtool bind-utils libXext-devel cyrus-sasl-devel glib2 glib2-devel openssl ncurses-devel bzip2 bzip2-devel flex bison libcurl-devel which libevent libevent-devel libgcj gettext-devel vim-minimal nano cairo-devel libpng-devel freetype freetype-devel libart_lgpl-devel  GeoIP-devel gperftools-devel libicu libicu-devel aspell gmp-devel aspell-devel libtidy libtidy-devel readline-devel iptables* coreutils libedit-devel enchant enchant-devel pam-devel git perl-ExtUtils perl-ExtUtils-MakeMaker perl-Time-HiRes openldap openldap-devel curl curl-devel diffutils libc-client libc-client-devel numactl lsof pkgconfig gdbm-devel tk-devel libatomic_ops-devel gperftools bluez-libs-devel
+sudo yum -y install unzip zip rar unrar rsync psmisc syslog-ng-libdbi
+sudo yum -y install sendmail sendmail-cf m4
+systemctl start sendmail.service
+systemctl enable sendmail.service
+
+cd ~
+
+sudo yum makecache fast
+#if [ "$phienbanmariadb" = "10.4" ] || [ "$phienbanmariadb" = "10.5" ]; then
+#sudo yum -y install perl-DBI libaio libsepol lsof boost-program-options
+#sudo yum -y install --repo="mariadb-main" MariaDB-server
+#else
+#sudo yum -y install --repo="mariadb" MariaDB-server
+sudo yum -y install MariaDB-client MariaDB-common MariaDB-compat MariaDB-devel MariaDB-server MariaDB-shared perl-DBD-MySQL
+#fi
+
+sudo yum -y install exim syslog-ng cronie cronie-anacron
+
+
+
+clear
+echo "=========================================================================="
+echo "Cai Dat Hoan Tat, Bat Dau Qua Trinh Cau Hinh...... "
+echo "=========================================================================="
+sleep 3
+ramformariadb=$(calc $svram/10*6)
+ramforphpnginx=$(calc $svram-$ramformariadb)
+max_children=$(calc $ramforphpnginx/30)
+memory_limit=$(calc $ramforphpnginx/5*3)M
+mem_apc=$(calc $ramforphpnginx/5)M
+buff_size=$(calc $ramformariadb/10*8)M
+log_size=$(calc $ramformariadb/10*2)M
+systemctl enable exim.service 
+systemctl enable syslog-ng.service
+systemctl start exim.service 
+systemctl start syslog-ng.service
+#systemctl disable httpd.service
+#systemctl enable nginx.service 
+#systemctl start nginx.service 
+#systemctl enable php-fpm.service 
+#systemctl start php-fpm.service
+#systemctl enable mariadb.service
+#systemctl start mariadb.service 
+chkconfig --add mysql
+chkconfig --levels 235 mysql on
+systemctl enable mysql
+service mysql start
+#systemctl enable redis.service
+#systemctl start redis.service
+
+# tao thu muc log va cac file log de phong truong hop cac ung dung khong the tu tao
+mkdir -p /home/$mainsite/logs
+mkdir -p /home/$mainsite/html
+chmod 777 /home/$mainsite/logs
+touch /home/$mainsite/logs/mysql-slow.log
+touch /home/$mainsite/logs/mysql.log
+touch /home/$mainsite/logs/php-fpm-error.log
+touch /home/$mainsite/logs/php-fpm-slow.log
+touch /home/$mainsite/logs/php-fpm.log
+chmod 777 /home/$mainsite/logs/*
+
+
+if [[ $svram -ge 32 && $svram -le 449  ]] ; then 
+pmmaxchildren=4
+pmstartservers=2
+pmminspareservers=1
+pmmaxspareservers=3
+pmmaxrequests=150
+###############################################
+elif [[ $svram -ge 450 && $svram -le 1300  ]] ; then
+pmmaxchildren=10
+pmstartservers=3
+pmminspareservers=2
+pmmaxspareservers=6
+pmmaxrequests=400
+###############################################
+elif [[ $svram -ge 1302 && $svram -le 1800  ]] ; then
+pmmaxchildren=15
+pmstartservers=3
+pmminspareservers=2
+pmmaxspareservers=6
+pmmaxrequests=500
+###############################################
+elif [[ $svram -ge 1801 && $svram -le 2800  ]] ; then
+pmmaxchildren=20
+pmstartservers=3
+pmminspareservers=2
+pmmaxspareservers=6
+pmmaxrequests=500
+###############################################
+elif [[ $svram -ge 2801 && $svram -le 5000  ]] ; then
+pmmaxchildren=33
+pmstartservers=3
+pmminspareservers=2
+pmmaxspareservers=6
+pmmaxrequests=500
+
+###############################################
+else
+pmmaxchildren=50
+pmstartservers=3
+pmminspareservers=2
+pmmaxspareservers=6
+pmmaxrequests=500
+fi
+
+
+if [[ $svram -ge 32 && $svram -le 449  ]] ; then 
+heso1=1
+elif [[ $svram -ge 450 && $svram -le 1099  ]] ; then
+heso1=1
+elif [[ $svram -ge 1100 && $svram -le 1999  ]] ; then
+heso1=3
+elif [[ $svram -ge 2000 && $svram -le 2999  ]] ; then
+heso1=6
+elif [[ $svram -ge 3000 && $svram -le 5000  ]] ; then
+heso1=8
+else
+heso1=10
+fi
+
+if [[ $svram -ge 32 && $svram -le 449  ]] ; then 
+heso2=1
+elif [[ $svram -ge 450 && $svram -le 1099  ]] ; then
+heso2=2
+elif [[ $svram -ge 1100 && $svram -le 1999  ]] ; then
+heso2=3
+elif [[ $svram -ge 2000 && $svram -le 2999  ]] ; then
+heso2=4
+elif [[ $svram -ge 3000 && $svram -le 5000  ]] ; then
+heso2=6
+else
+heso2=10
+fi
+
+if [[ $svram -ge 32 && $svram -le 449  ]] ; then 
+heso3=1
+elif [[ $svram -ge 450 && $svram -le 1099  ]] ; then
+heso3=2
+elif [[ $svram -ge 1100 && $svram -le 1999  ]] ; then
+heso3=3
+elif [[ $svram -ge 2000 && $svram -le 2999  ]] ; then
+heso3=4
+elif [[ $svram -ge 3000 && $svram -le 5000  ]] ; then
+heso3=5
+else
+heso3=6
+fi
+
+if [[ $svram -ge 32 && $svram -le 449  ]] ; then 
+heso4=1
+elif [[ $svram -ge 450 && $svram -le 1099  ]] ; then
+heso4=1
+elif [[ $svram -ge 1100 && $svram -le 1999  ]] ; then
+heso4=2
+elif [[ $svram -ge 2000 && $svram -le 2999  ]] ; then
+heso4=2
+elif [[ $svram -ge 3000 && $svram -le 5000  ]] ; then
+heso4=3
+else
+heso4=4
+fi
+
+if ! [[ $cpucores =~ $checktruenumber ]] ; then
+cpucores=1
+fi 
+
+rm -f /etc/my.cnf.d/server.cnf
+cat > "/etc/my.cnf.d/server.cnf" <<END
+
+[mysqld]
+skip-host-cache
+skip-name-resolve
+collation-server = utf8_unicode_ci
+init-connect='SET NAMES utf8'
+character-set-server = utf8
+skip-character-set-client-handshake
+
+user = mysql
+default-storage-engine = InnoDB
+local-infile=0
+ignore-db-dir=lost+found
+character-set-server=utf8
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+
+#bind-address=127.0.0.1
+back_log = $(calc 75*$heso2)
+max_connections = $(calc 22*$heso2)
+key_buffer_size = 32M
+myisam_recover = FORCE,BACKUP
+myisam_sort_buffer_size = $(calc 32*$heso1)M
+join_buffer_size = $(calc 32*$heso2)K  
+read_buffer_size = $(calc 32*$heso2)K 
+sort_buffer_size = $(calc 64*$heso2)K 
+table_definition_cache = 2048
+table_open_cache = 2048
+thread_cache_size = $(calc 8*$heso2)K
+wait_timeout = 50
+connect_timeout = 10
+interactive_timeout = 40
+optimizer_search_depth = 4
+tmp_table_size = $(calc 16*$heso3)M
+max_heap_table_size = $(calc 16*$heso3)M
+max_allowed_packet = $(calc 16*$heso2)M
+max_seeks_for_key = 1000
+
+max_length_for_sort_data = 1024
+net_buffer_length = 16384
+max_connect_errors = 100000
+concurrent_insert = 2
+read_rnd_buffer_size = $(calc 1*$heso2)M
+bulk_insert_buffer_size = 8M
+query_cache_limit = 512K
+query_cache_size = $(calc 8*$heso2)M
+query_cache_type = 1
+query_cache_min_res_unit = 2K
+
+
+log_warnings=1
+slow_query_log=0
+long_query_time=1
+log_error = /home/$mainsite/logs/mysql.log
+log_queries_not_using_indexes = 0
+slow_query_log_file = /home/$mainsite/logs/mysql-slow.log
+
+# innodb settings
+innodb_large_prefix=1
+innodb_purge_threads=1
+innodb_file_format = Barracuda
+innodb_file_per_table = 1
+innodb_open_files = $(calc 200*$heso2)
+innodb_data_file_path= ibdata1:10M:autoextend
+innodb_buffer_pool_size = $(calc 64*$heso2)M
+skip-innodb_doublewrite # or commented out
+
+## https://mariadb.com/kb/en/mariadb/xtradbinnodb-server-system-variables/#innodb_buffer_pool_instances
+#innodb_buffer_pool_instances=2
+
+innodb_log_files_in_group = 2
+innodb_log_file_size = 48M
+#innodb_log_buffer_size = 1M
+innodb_flush_log_at_trx_commit = 2
+innodb_thread_concurrency = $(calc 2*$cpucores)
+innodb_lock_wait_timeout=50
+innodb_flush_method = O_DIRECT
+innodb_support_xa=1
+
+# 200 * # DISKS
+#innodb_io_capacity = 100 # 100 for HDD
+innodb_read_io_threads = $(calc 4*$cpucores)
+innodb_write_io_threads = $(calc 4*$cpucores)
+
+# mariadb settings
+[mariadb]
+
+userstat = 0
+#key_cache_segments = 0  # 1 to 64
+aria_group_commit = none
+aria_group_commit_interval = 0
+aria_log_file_size = $(calc 11*$heso2)M
+aria_log_purge_type = immediate 
+aria_pagecache_buffer_size = 1M
+aria_sort_buffer_size = 1M
+
+[mariadb-5.5]
+#ignore_db_dirs=
+query_cache_strip_comments=0
+
+innodb_read_ahead = linear
+innodb_adaptive_flushing_method = estimate
+innodb_flush_neighbor_pages=none
+innodb_stats_update_need_lock = 0
+innodb_log_block_size = 512
+
+log_slow_filter =admin,filesort,filesort_on_disk,full_join,full_scan,query_cache,query_cache_miss,tmp_table,tmp_table_on_disk
+
+[mysqld_safe] 
+socket=/var/lib/mysql/mysql.sock
+log-error=/home/$mainsite/logs/mysql.log
+#nice = -5
+open-files-limit = 8192
+
+[mysqldump]
+quick
+max_allowed_packet = 32M
+
+[isamchk]
+key_buffer = $(calc 16*$heso4)M
+sort_buffer_size = $(calc 128*$heso4)K
+read_buffer = $(calc 128*$heso4)K
+write_buffer = $(calc 128*$heso4)K
+
+[myisamchk]
+key_buffer = $(calc 16*$heso4)M
+sort_buffer_size = $(calc 128*$heso4)K
+read_buffer = $(calc 128*$heso4)K
+write_buffer = $(calc 128*$heso4)K
+
+[mysqlhotcopy]
+interactive-timeout
+END
+
+
+# fixed ERROR for MariaDB config (xu ly loi config tren cac phien ban MariaDB khac nhau)
+if [ "$phienbanmariadb" = "10.2" ] ; then
+# ERROR: Field doesn't have a default value -> Loi sql_mode trong phien ban 10.2++
+cat > "/tmp/echbayolsSetConfigFile" <<END
+#!/bin/bash 
+sed -i -e "/sql_mode=/d" /etc/my.cnf.d/server.cnf
+sed -i '/^skip-character-set-client-handshake.*/a sql_mode=NO_ENGINE_SUBSTITUTION' /etc/my.cnf.d/server.cnf
+END
+chmod +x /tmp/echbayolsSetConfigFile
+sh /tmp/echbayolsSetConfigFile
+fi
+
+if [ "$phienbanmariadb" = "10.3" ] || [ "$phienbanmariadb" = "10.4" ] || [ "$phienbanmariadb" = "10.5" ] ; then
+# https://mariadb.com/kb/en/upgrading-from-mariadb-102-to-mariadb-103/
+cat > "/tmp/echbayolsSetConfigFile" <<END
+#!/bin/bash 
+sed -i 's/innodb_support_xa=/\#innodb_support_xa=/g' /etc/my.cnf.d/server.cnf
+END
+chmod +x /tmp/echbayolsSetConfigFile
+sh /tmp/echbayolsSetConfigFile
+fi
+
+
+if [ "$phienbanmariadb" = "10.0" ] || [ "$phienbanmariadb" = "10.1" ] || [ "$phienbanmariadb" = "10.2" ] ; then
+cat >> "/etc/my.cnf.d/server.cnf" <<END
+
+[mariadb-$phienbanmariadb]
+innodb_buffer_pool_dump_at_shutdown=1
+innodb_buffer_pool_load_at_startup=1
+innodb_buffer_pool_populate=0
+performance_schema=OFF
+innodb_stats_on_metadata=OFF
+innodb_sort_buffer_size=1M
+query_cache_strip_comments=0
+log_slow_filter =admin,filesort,filesort_on_disk,full_join,full_scan,query_cache,query_cache_miss,tmp_table,tmp_table_on_disk
+
+END
+fi
+
+if [ "$phienbanmariadb" = "10.3" ] || [ "$phienbanmariadb" = "10.4" ] || [ "$phienbanmariadb" = "10.5" ] ; then
+cat >> "/etc/my.cnf.d/server.cnf" <<END
+
+[mariadb-$phienbanmariadb]
+innodb_buffer_pool_dump_at_shutdown=1
+innodb_buffer_pool_load_at_startup=1
+#innodb_buffer_pool_populate=0
+performance_schema=OFF
+innodb_stats_on_metadata=OFF
+innodb_sort_buffer_size=1M
+query_cache_strip_comments=0
+log_slow_filter =admin,filesort,filesort_on_disk,full_join,full_scan,query_cache,query_cache_miss,tmp_table,tmp_table_on_disk
+
+END
+fi
+
+
+mkdir -p /etc/echbayols
+
+echo "" > /etc/echbayols/pwprotect.default
+cat > "/etc/echbayols/pwprotect.default" <<END
+userdefault="$usernamebv"
+passdefault="$matkhaubv"
+END
+
+cat > "/etc/echbayols/echbayols.version" <<END
+${echbayols_version}
+END
+
+rm -f /home/echbayols.conf
+cat > "/home/echbayols.conf" <<END
+mainsite="$mainsite"
+serverip="$svip"
+emailmanage="$echbayolsemail"
+mariadbuser="root"
+END
+
+cat > "/etc/echbayols/phpmyadmin.version" <<END
+${phpmyadmin_version}
+END
+
+rm -f /var/lib/mysql/ib_logfile0
+rm -f /var/lib/mysql/ib_logfile1
+rm -f /var/lib/mysql/ibdata1
+if [ "$phienbanmariadb" = "10.4" ] ; then
+sudo systemctl enable --now mariadb
+fi
+service mysql start
+
+# Download mysql_secure_installation
+#rm -rf /bin/mysql_secure_installation
+#yes | cp -rf /opt/echbayols/mysql_secure_installation /bin/mysql_secure_installation && chmod +x /bin/mysql_secure_installation
+
+yes | cp -rf /opt/echbayols/Softwear/wp-cli.phar wp-cli.phar
+chmod +x wp-cli.phar
+mv wp-cli.phar /usr/local/bin/wp
+
+#clear
+#echo "=========================================================================="
+#echo "Dat Mat Khau Cho Tai Khoan root Cua MYSQL ... "
+#echo "=========================================================================="
+#echo $(`cat /bin/mysql_secure_installation`)
+#/bin/mysql_secure_installation
+
+#systemctl restart mariadb.service
+service mysql restart
+
+
+
+#Setting Up
+touch $LSWSDIR/domain
+mv -f $LSWSDIR/conf/vhosts/Example/ $LSWSDIR/conf/vhosts/echbayols.demo/
+rm -f $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf
+rm -f $LSWSDIR/conf/httpd_config.conf
+rm -f $LSWSDIR/admin/conf/admin_config.conf
+
+#wget -O $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf $GITRAW/conf/vhconf.conf
+yes | cp -rf $GITCLONE/conf/vhconf.conf $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf
+#wget -O $LSWSDIR/conf/httpd_config.conf $GITRAW/conf/httpd_config.conf
+yes | cp -rf $GITCLONE/conf/httpd_config.conf $LSWSDIR/conf/httpd_config.conf
+#wget -O $LSWSDIR/admin/conf/admin_config.conf $GITRAW/conf/admin_config.conf
+yes | cp -rf $GITCLONE/conf/admin_config.conf $LSWSDIR/admin/conf/admin_config.conf
+
+chown lsadm:lsadm $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf
+chown lsadm:lsadm $LSWSDIR/conf/httpd_config.conf
+chown lsadm:lsadm $LSWSDIR/admin/conf/admin_config.conf
+
+#Copy Templates
+#wget -O $LSWSDIR/conf/templates/incl.conf $GITRAW/templates/incl.conf
+yes | cp -rf $GITCLONE/templates/incl.conf $LSWSDIR/conf/templates/incl.conf
+#wget -O $LSWSDIR/conf/templates/vhconf.conf $GITRAW/templates/vhconf.conf
+yes | cp -rf $GITCLONE/templates/vhconf.conf $LSWSDIR/conf/templates/vhconf.conf
+
+# Create Content in Homedir and logs
+touch /home/echbayols.demo/html/.htaccess
+touch /home/echbayols.demo/logs/{error.log,access.log}
+cat << EOT > /home/echbayols.demo/html/index.php
+<?php
+echo "Its Works!";
+?>
+EOT
+chown -R nobody:nobody /home/echbayols.demo/html/
+
+# Installing PHPMYAdmin
+mkdir $LSWSDIR/pma
+mkdir $LSWSDIR/pma/{html,logs}
+mkdir $LSWSDIR/conf/vhosts/pma
+mkdir $LSWSDIR/conf/cert/pma
+touch $LSWSDIR/pma/logs/error.log
+touch $LSWSDIR/pma/logs/access.log
+#wget -O $LSWSDIR/conf/vhosts/pma/vhconf.conf $GITRAW/conf/pma_vhconf.conf
+yes | cp -rf $GITCLONE/conf/pma_vhconf.conf $LSWSDIR/conf/vhosts/pma/vhconf.conf
+wget --no-check-certificate -O $LSWSDIR/pma/html/pma.tar.gz https://files.phpmyadmin.net/phpMyAdmin/${phpmyadmin_version}/phpMyAdmin-${phpmyadmin_version}-english.tar.gz
+cd $LSWSDIR/pma/html/
+tar -xzvf pma.tar.gz
+mv phpMyAdmin-${phpmyadmin_version}-english/* ./
+#wget -O config.inc.php $GITRAW/conf/config.inc.php
+#sed -i "s/#BLOWFISH#/$PMABLOWFISH/g" config.inc.php
+randomblow=`date |md5sum |cut -c '1-32'`;
+sed -e "s|cfg\['blowfish_secret'\] = ''|cfg['blowfish_secret'] = '$randomblow'|" config.sample.inc.php > config.inc.php
+mkdir tmp
+rm -f pma.tar.gz && rm -rf phpMyAdmin-${phpmyadmin_version}-english
+cd /
+chown -R lsadm:lsadm $LSWSDIR/pma/
+
+# Generate cerificare for PMA
+openssl genrsa -out $LSWSDIR/conf/cert/pma/pma.key 2048
+openssl rsa -in $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/cert/pma/pma.key
+openssl req -sha256 -new -key $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/cert/pma/pma.csr -subj "/CN=localhost"
+openssl x509 -req -sha256 -days 365 -in $LSWSDIR/conf/cert/pma/pma.csr -signkey $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/cert/pma/pma.crt
+
+#Setting MySQL
+systemctl start mariadb
+#systemctl start proftpd
+$LSWSDIR/bin/lswsctrl start
+mysql -uroot -v -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+mysql -uroot -v -e "DROP DATABASE test;"
+mysql -uroot -v -e "DELETE FROM mysql.user WHERE User='';"
+mysql -uroot -v -e "use mysql;update user set Password=PASSWORD('$ROOTSQLPWD') where user='root'; flush privileges;"
+
+# Save Password root MariaDB
+cat << EOT > /root/.MariaDB
+$ROOTSQLPWD
+EOT
+
+# Create PHP symlink
+ln -s /usr/local/lsws/lsphp72/bin/lsphp /usr/bin/php
+
+
+cd ~
+
+
+clear
+echo "=========================================================================="
+echo "Dang Tao ECHBAY-OLS Menu...... "
+echo "=========================================================================="
+rm -rf /etc/motd
+
+yes | cp -rf /opt/echbayols/motd /etc/motd
+
+clear
+sleep 3
+rm -rf /root/install*
+rm -rf /root/echbayols-setup
+cat >> "/home/echbayols-manage-info.txt" <<END
+=========================================================================
+                           VPS MANAGE INFOMATION                         
+=========================================================================
+
+phpMyAdmin: http://$svip/phpmyadmin/index.php
+
+WebAdmin: http://$svip:$svport
+Username: $usernamebv  
+Password: $matkhaubv 
+
+MySQL root Password: $passrootmysql
+
+Lenh truy cap ECHBAY-OLS: echbay
+
+Chuc ban se thanh cong cung ECHBAY-OLS .
+END
+
+
+# increase SSH login speed
+if [ -f /etc/ssh/sshd_config ]; then 
+sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_config
+sed -i 's/#UseDNS yes/UseDNS no/g' /etc/ssh/sshd_config
+fi
+
+
+cat > "/tmp/finishedemail.sh" <<END
+#!/bin/bash 
+echo -e 'Subject: ECHBAY-OLS - Chuc mung cai dat thanh cong $svip!
+
+Chao ban!
+
+Chuc mung ban da hoan thanh qua trinh cai dat va cau hinh server $svip bang ECHBAY-OLS.
+Sau day la thong tin quan ly server cua ban:
+
++ Lenh goi ECHBAY-OLS: echbay
++ Link phpMyAdmin: http://$svip/phpmyadmin/index.php
+WebAdmin: http://$svip:$svport
+Username: $usernamebv  
+Password: $matkhaubv 
+
+MySQL root Password: $passrootmysql
+
+Luu Y:
+
++ Sau khi cai dat xong, neu server chua tao SWAP (RAM ao), ban tao them SWAP bang chuc nang [ Quan Ly Swap ] (Bat buoc).
++ De dat mat khau bao mat phpMyAdmin, backup files, ...: dung chuc nang [ BAT/TAT Bao Ve phpMyAdmin ] trong [ Quan Ly phpMyAdmin ]
++ De cai dat File Manager: Dung chuc nang [ Cai Dat File Manager ] 
++ Sau khi them website vao server, cai dat FTP server va tao tai khoan FTP cho tung website tren server bang chuc nang [ Quan Ly FTP Server ].
+  Mac dinh ban khong the dang nhap FTP vao server bang tai khoan root. Neu muon dang nhap, ban phai dung sFTP voi thong tin dang nhap:
+  Host: sftp://$svip  - User: root - Password: Your_password - Port: 22 (hoac port SSH ban da thay)
++ Neu server Timezone khong trung voi gio cua ban, cai dat lai time zone cho Server bang chuc nang [ Cai Dat Server Timezone ] trong [ Tien Ich - Addons ]
++ Sau khi Upload code len server. Ban phai chay chuc nang [ Fix Loi Chmod, Chown ] trong [ Tien Ich - Addons ] de thiet lap phan quyen cho website. 
+  Neu website su dung code wordpress, thiet lap phan quyen cho website bang chuc nang [ Fix loi Permission ] trong [ Wordpress Blog Tools ]
++ Tuy theo so luong website, dung luong code ma ban cau hinh lai Zend Opcache, Memcached, Redis Cache bang chuc nang [ Quan Ly Memcached ], [ Quan Ly Zend Opcache ] , [ Quan Ly Redis Cache ] cho phu hop.
++ De bao mat, moi khi co dang nhap SSH va Server, ECHBAY-OLS se gui email thong bao toi dia chi email $echbayolsemail .
+  Thay email hoac tat chuc nang nay bang [ BAT/TAT Email Thong Bao Login ] trong [ Tien ich - Addons ].  
+  
+ECHBAY-OLS by Dao Quoc Dai - https://echbay.com' | exim  $echbayolsemail
+END
+chmod +x /tmp/finishedemail.sh
+/tmp/finishedemail.sh
+rm -f /tmp/finishedemail.sh
+
+rm -f /tmp/echbayols.conf
+rm -f /tmp/echbayolsSetConfigFile
+
+
+
+clear
+echo "=========================================================================="
+echo "ECHBAY-OLS da hoan tat qua trinh cai dat Server. "
+echo "=========================================================================="
+echo "Lenh goi ECHBAY-OLS: echbay"
+echo "--------------------------------------------------------------------------"
+echo "Link phpMyAdmin: http://$svip/phpmyadmin/index.php"
+echo "--------------------------------------------------------------------------"
+echo "WebAdmin: http://$svip:$svport"
+echo "Username: $usernamebv"
+echo "Password: $matkhaubv"
+echo "--------------------------------------------------------------------------"
+echo "MySQL root Password: $passrootmysql"
+echo "=========================================================================="
+echo "Thong tin quan ly duoc luu tai: /home/echbayols-manage-info.txt "
+echo "--------------------------------------------------------------------------"
+echo "va gui kem luu y su dung ECHBAY-OLS toi: $echbayolsemail"
+echo "=========================================================================="
+echo "Server se tu khoi dong lai sau 3 giay.... "
+sleep 3
+#reboot
+exit
+

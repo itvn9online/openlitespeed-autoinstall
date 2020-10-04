@@ -1,0 +1,83 @@
+#!/bin/sh
+
+if [ $(id -u) != "0" ]; then
+    echo "ERROR: script run with root user only, please login with user root!"
+    exit
+fi
+
+# find another control panel if exist
+detected_control=""
+if [ -f /var/cpanel/cpanel.config ]; then
+detected_control="WHM/Cpanel"
+elif [ -f /etc/psa/.psa.shadow ]; then
+detected_control="Plesk"
+if [ -f /etc/init.d/directadmin ]; then
+detected_control="DirectAdmin"
+if [ -f /etc/init.d/webmin ]; then
+detected_control="WebMin"
+elif [ -f /home/echbayols.conf ]; then
+detected_control="ECHBAY-OLS"
+rm -rf install*
+fi
+
+if [ ! "$detected_control" == "" ]; then
+clear
+echo "========================================================================="
+echo $detected_control" detected in your server, if you want continue"
+echo "Reinstall OS and retry (recommended CentOS 7 - 64bit)"
+echo "Good bye and see again!"
+echo "========================================================================="
+exit
+fi
+
+arch=`uname -m`
+if [ ! "$arch" = "x86_64" ]; then
+clear
+echo "========================================================================="
+echo "ECHBAY-OLS run only in OS x64"
+echo "Please reinstall OS x86_64 and retry"
+echo "Good bye and see again!"
+echo "========================================================================="
+rm -rf install*
+exit
+fi
+
+#if [ -f /etc/yum.repos.d/epel.repo ]; then
+#sudo sed -i "s/mirrorlist=https/mirrorlist=http/" /etc/yum.repos.d/epel.repo
+#fi
+
+yes | cp -rf /opt/echbayols/calc /bin/calc && chmod +x /bin/calc
+clear  
+rm -rf ~/echbayols*
+
+echo "========================================================================="
+echo "ECHBAY-OLS run only in Centos 7 & Centos 8 x64"
+echo "-------------------------------------------------------------------------"
+echo "Recommended using Centos 7 x64."
+echo "-------------------------------------------------------------------------"
+echo "========================================================================="
+
+current_os_version=$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))
+#echo $current_os_version
+
+cd ~
+echo "----------------------------------------------------------------------------"
+echo "Please wait ..."
+sleep 2
+
+if [ "$current_os_version" == "5" ] || [ "$current_os_version" == "6" ]; then
+clear
+echo "========================================================================="
+echo "ECHBAY-OLS run only in Centos 7 & Centos 8 x64"
+echo "Please reinstall OS x86_64 and retry"
+echo "Good bye and see again!"
+echo "========================================================================="
+rm -rf install*
+exit
+#elif [ "$current_os_version" == "7" ]; then
+#yes | cp -rf /opt/echbayols/script/centos/${current_os_version}/echbayols-setup ~/echbayols-setup ; chmod +x echbayols-setup ; clear ; bash echbayols-setup
+else
+#yes | cp -rf /opt/echbayols/script/centos/8/echbayols-setup ~/echbayols-setup ; chmod +x echbayols-setup ; clear ; bash echbayols-setup
+yes | cp -rf /opt/echbayols/script/centos/echbayols-setup ~/echbayols-setup ; chmod +x echbayols-setup ; clear ; bash echbayols-setup
+fi
+

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+yes | cp -rf /opt/echbayols/version /opt/echbayols/echbayols.newversion
+rm -rf ~/git-clone*
+rm -rf ~/install*

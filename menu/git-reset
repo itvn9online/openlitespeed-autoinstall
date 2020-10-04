@@ -1,0 +1,19 @@
+#!/bin/sh
+
+echo "-------------------------------------------------------------------------"
+echo "Ok ! please wait check reset code from git..."
+
+cd ~
+if [ -d /opt/echbayols ]; then
+rm -rf /opt/echbayols/*
+rm -rf /opt/echbayols
+sleep 5
+fi
+
+/etc/echbayols/menu/git-clone
+sleep 1
+
+clear
+echo "========================================================================="
+echo "Done! Reset code from git..."
+/etc/echbayols/menu/update-upgrade-service-menu
