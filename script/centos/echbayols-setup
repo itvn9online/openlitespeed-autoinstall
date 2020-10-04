@@ -43,6 +43,7 @@ phienbanmariadb=10.2
 checktruenumber='^[0-9]+$'
 
 svport=7080
+phpmyadminport=8090
 
 kiemtraemail3="^(([-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~])+\.)*[-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~]+@\w((-|\w)*\w)*\.(\w((-|\w)*\w)*\.)*\w{2,24}$";
 svip=$(wget http://ipecho.net/plain -O - -q ; echo)
@@ -127,7 +128,8 @@ echo -n "Confirm continue install (y/N): "
 read xacnhanthongtin
 
 if [ "$xacnhanthongtin" = "y" ]; then
-echo "--------------------------------------------------------------------------"
+clear
+#echo "--------------------------------------------------------------------------"
 echo "Waiting install ECHBAY-OLS..."
 sleep 2
 else 
@@ -140,11 +142,12 @@ fi
 
 
 
+clear
 
 # Update
-echoG "Update system"
-yum -y install epel-release > /dev/null 2>&1
-yum -y install wget certbot openssl > /dev/null 2>&1
+echoG "Update system, please wait..."
+yum -y install epel-release
+yum -y install wget certbot openssl
 #wget -O /etc/yum.repos.d/MariaDB.repo $GITRAW/repo/MariaDB.repo
 cat > "/etc/yum.repos.d/mariadb.repo" <<END
 # MariaDB $phienbanmariadb CentOS repository list 
@@ -156,11 +159,11 @@ gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
 END
 rpm -ivh http://rpms.litespeedtech.com/centos/litespeed-repo-1.1-1.el${el_version}.noarch.rpm
-yum -y update > /dev/null 2>&1
+yum -y update
 
 # Install Proftpd
 echoG "Install proftpd"
-yum -y install proftpd > /dev/null 2>&1
+yum -y install proftpd
 sed -i "s/ProFTPD server/$HOSTNAME/g" /etc/proftpd.conf
 
 #Install Openlitespeed & MariaDB
@@ -244,7 +247,7 @@ GITR_wget_to_copy $LSWSDIR/conf/vhosts/pma/vhconf.conf $GITRAW/conf/pma_vhconf.c
 
 wget --no-check-certificate -O $LSWSDIR/pma/html/pma.tar.gz https://files.phpmyadmin.net/phpMyAdmin/${phpmyadmin_version}/phpMyAdmin-${phpmyadmin_version}-english.tar.gz
 cd $LSWSDIR/pma/html/
-tar -xzvf pma.tar.gz
+tar -xzvf pma.tar.gz > /dev/null 2>&1
 mv phpMyAdmin-${phpmyadmin_version}-english/* ./
 
 # v2
@@ -266,7 +269,7 @@ openssl req -sha256 -new -key $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/
 openssl x509 -req -sha256 -days 365 -in $LSWSDIR/conf/cert/pma/pma.csr -signkey $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/cert/pma/pma.crt
 
 # Open port Needed in Firewall
-FIREWALLLIST="21 22 80 443 $svport 8090"
+FIREWALLLIST="21 22 80 443 $svport $phpmyadminport"
 centos_firewall_add(){
     echoG 'Setting Firewall'
     if [ ! -e /usr/sbin/firewalld ]; then 
@@ -288,8 +291,8 @@ centos_firewall_add(){
 #firewall-cmd --zone=public --permanent --add-port=21/tcp
 #firewall-cmd --zone=public --permanent --add-port=80/tcp
 #firewall-cmd --zone=public --permanent --add-port=443/tcp
-#firewall-cmd --zone=public --permanent --add-port=7080/tcp
-#firewall-cmd --zone=public --permanent --add-port=8090/tcp
+#firewall-cmd --zone=public --permanent --add-port=${svport}/tcp
+#firewall-cmd --zone=public --permanent --add-port=${phpmyadminport}/tcp
 #firewall-cmd --reload
 centos_firewall_add
 
@@ -330,7 +333,7 @@ rm -rf /usr/local/lsws/admin/misc/auto_lsws_admpass
 #
 mkdir -p /var/lib/php/session
 chown -R lsadm:lsadm /var/lib/php
-#chmod 755 /var/lib/php/session
+chmod 777 /var/lib/php/session
 chmod 777 $LSWSDIR/pma/html/tmp
 
 
@@ -344,10 +347,92 @@ yes | cp -rf $GITRAW/motd /etc/motd
 # Download echbay_main_menu
 yes | cp -rf $GITRAW/echbay /bin/echbay && chmod +x /bin/echbay
 
+mkdir -p /etc/echbay
+
 mkdir -p /etc/echbay/menu ; chmod 755 /etc/echbay/menu
 yes | cp -rf $GITRAW/menu/. /etc/echbay/menu/
 
 /opt/echbayols/menu/chmod-755-menu
+
+cat > "/etc/echbay/echbay.version" <<END
+${echbayols_version}
+END
+
+cat > "/etc/echbay/phpmyadmin.version" <<END
+${phpmyadmin_version}
+END
+
+if [ ! "$(grep LANG=en_US.utf-8 /etc/environment)" == "LANG=en_US.utf-8" ]; then
+cat > "/etc/environment" <<END
+LANG=en_US.utf-8
+LC_ALL=en_US.utf-8
+END
+fi
+
+rm -f /home/echbayols.conf
+cat > "/home/echbayols.conf" <<END
+mainsite="$mainsite"
+priport="$svport"
+serverip="$svip"
+END
+
+
+
+# increase SSH login speed
+if [ -f /etc/ssh/sshd_config ]; then 
+sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_config
+sed -i 's/#UseDNS yes/UseDNS no/g' /etc/ssh/sshd_config
+fi
+#Change default folder ssh login
+#if [ -f /root/.bash_profile ]; then
+#sed -i "/.*#\ .bash_profile.*/acd /home" /root/.bash_profile
+#fi
+
+
+
+cat >> "/home/ECHBAY-manage-info.txt" <<END
+=========================================================================
+                           VPS MANAGE INFOMATION                         
+=========================================================================
+
++ Lenh goi ECHBAY-OLS: echbay
+
++ Link phpMyAdmin: http://$svip:$phpmyadminport
+MySQL root Password: $passrootmysql
+
++ Open LiteSpeed control panel: http://$svip:$svport
+Username: $usernamebv  
+Password: $matkhaubv 
+
+Chuc ban se thanh cong cung ECHBAY-OLS.
+
+ECHBAY-OLS by Dao Quoc Dai - https://echbay.com
+END
+
+
+cat > "/tmp/finishedemail.sh" <<END
+#!/bin/bash 
+echo -e 'Subject: ECHBAY-OLS - Chuc mung cai dat thanh cong $svip!
+
+Chao ban!
+
+Chuc mung ban da hoan thanh qua trinh cai dat va cau hinh server $svip bang ECHBAY-OLS.
+Sau day la thong tin quan ly server cua ban:
+
++ Lenh goi ECHBAY-OLS: echbay
+
++ Link phpMyAdmin: http://$svip:$phpmyadminport
+MySQL root Password: $passrootmysql
+
++ Open LiteSpeed control panel: http://$svip:$svport
+Username: $usernamebv  
+Password: $matkhaubv 
+  
+ECHBAY-OLS by Dao Quoc Dai - https://echbay.com' | exim  $echbayolsemail
+END
+chmod +x /tmp/finishedemail.sh
+/tmp/finishedemail.sh
+rm -f /tmp/finishedemail.sh
 
 
 clear
@@ -360,7 +445,7 @@ echo "WebAdmin: https://$svip:$svport"
 echo "Username: $usernamebv"
 echo "Password: $matkhaubv"
 echo "--------------------------------------------------------------------------"
-echo "Link phpMyAdmin: https://$svip:8090"
+echo "Link phpMyAdmin: https://$svip:$phpmyadminport"
 echo "MySQL root Password: $passrootmysql"
 echo "=========================================================================="
 echo "Thong tin quan ly duoc luu tai: /home/echbayols-manage-info.txt "
