@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /home/echbay.conf
+. /home/echbayols.conf
 
 if [ ! -f /etc/echbay/echbayols.version ]; then
 clear
@@ -86,7 +86,7 @@ echo "Begin update ECHBAY-OLS..... "
 sleep 1
 
 rm -rf /etc/echbay/echbay-update
-wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/echbay-free/master/script/echbay/echbay-update -O /etc/echbay/echbay-update
+wget --no-check-certificate -q https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/echbay-update -O /etc/echbay/echbay-update
 chmod +x /etc/echbay/echbay-update
 bash /etc/echbay/echbay-update
 
@@ -97,12 +97,12 @@ exit
 clear
 
 printf "=========================================================================\n"
-echo "Ban da huy bo update ECHBAY-OLS"
-/etc/echbay/menu/echbay-update-upgrade-service-menu
+echo "Cancel update ECHBAY-OLS"
+/etc/echbay/menu/update-upgrade-service-menu
 ;;
 esac
 
-clear && /etc/echbay/menu/echbay-update-upgrade-service-menu
+clear && /etc/echbay/menu/update-upgrade-service-menu
 
 
 
