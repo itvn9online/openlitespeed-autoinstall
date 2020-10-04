@@ -7,6 +7,8 @@ PMABLOWFISH=`date |md5sum |cut -c '1-32'`;
 # Define short code
 GITRAW=https://raw.githubusercontent.com/tujuhion/openlitespeed-centos-autoinstall/master
 LSWSDIR=/usr/local/lsws
+GITCLONE=/opt/echbayols
+mainsite="echbayols.demo"
 
 
 current_os_version=$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))
@@ -15,6 +17,102 @@ el_version=$current_os_version
 else
 el_version="8"
 fi
+
+phpmyadmin_version=`cat /opt/echbayols/00-all-phpmyadmin-version.txt`
+mariadbversion="10.2";
+phienbanmariadb=10.2
+
+#
+checktruenumber='^[0-9]+$'
+
+svport=7080
+
+kiemtraemail3="^(([-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~])+\.)*[-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~]+@\w((-|\w)*\w)*\.(\w((-|\w)*\w)*\.)*\w{2,24}$";
+svip=$(wget http://ipecho.net/plain -O - -q ; echo)
+cpuname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo )
+cpucores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
+cpufreq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo )
+svram=$( free -m | awk 'NR==2 {print $2}' )
+svhdd=$( df -h | awk 'NR==2 {print $2}' )
+svswap=$( free -m | awk 'NR==4 {print $2}' )
+free -m
+df -h
+echo "=========================================================================="
+echo "Server info:"
+echo "--------------------------------------------------------------------------"
+echo "Server Type: $(virt-what | awk 'NR==1 {print $NF}')"
+echo "CPU Type: $cpuname"
+echo "CPU Core: $cpucores"
+echo "CPU Speed: $cpufreq MHz"
+echo "Memory: $svram MB"
+echo "Disk: $svhdd"
+echo "IP: $svip"
+echo "--------------------------------------------------------------------------"
+#echo "Dien Thong Tin Cai Dat: "
+
+echo "--------------------------------------------------------------------------"
+echo -n "Enter your email [ENTER]: " 
+read echbayolsemail
+if [ "$echbayolsemail" = "" ]; then
+clear
+echo "=========================================================================="
+echo "Please enter your email!"
+echo "-------------------------------------------------------------------------"
+read -p "Press [Enter] to continue..."
+clear
+bash /root/echbayols-setup
+exit
+fi
+
+if [[ ! "$echbayolsemail" =~ $kiemtraemail3 ]]; then
+clear
+echo "=========================================================================="
+echo "ERROR! email format: $echbayolsemail"
+echo "--------------------------------------------------------------------------"
+read -p "Press [Enter] to continue..."
+clear
+bash /root/echbayols-setup
+exit
+fi
+
+matkhaubv=`date |md5sum |cut -c '1-6'`
+usernamebv=`echo "${echbayolsemail};" | sed 's/\([^@]*\)@\([^;.]*\)\.[^;]*;[ ]*/\1 \2\n/g' | awk 'NR==1 {print $1}'`
+
+rm -f /tmp/echbayols.conf
+cat > "/tmp/echbayols.conf" <<END
+matkhaubv="$matkhaubv"
+usernamebv="$usernamebv"
+passrootmysql="$passrootmysql"
+END
+
+echbayols_version=`cat /opt/echbayols/echbayols.newversion`
+
+
+clear
+
+echo "=========================================================================="
+echo "OS Version: "$current_os_version
+echo "--------------------------------------------------------------------------"
+echo "ECHBAY-OLS will setup Server with info:"
+echo "=========================================================================="
+echo "eMail Quan Ly: $echbayolsemail"
+echo "--------------------------------------------------------------------------"
+echo "phpMyAdmin Version: "$phpmyadmin_version
+echo "--------------------------------------------------------------------------"
+echo "MariaDB Version: $phienbanmariadb"
+echo "--------------------------------------------------------------------------"
+echo "Mat khau tai khoan root MySQL: $passrootmysql"
+echo "--------------------------------------------------------------------------"
+echo "ECHBAY-OLS Version: $echbayols_version"
+echo "=========================================================================="
+
+echo -n "Confirm continue install (y/N): " 
+read xacnhanthongtin
+
+
+
+
+
 
 # Update
 yum -y install epel-release
@@ -101,17 +199,17 @@ mkdir $LSWSDIR/conf/cert/pma
 touch $LSWSDIR/pma/logs/error.log
 touch $LSWSDIR/pma/logs/access.log
 wget -O $LSWSDIR/conf/vhosts/pma/vhconf.conf $GITRAW/conf/pma_vhconf.conf
-wget --no-check-certificate -O $LSWSDIR/pma/html/pma.tar.gz https://files.phpmyadmin.net/phpMyAdmin/4.8.2/phpMyAdmin-4.8.2-english.tar.gz
+wget --no-check-certificate -O $LSWSDIR/pma/html/pma.tar.gz https://files.phpmyadmin.net/phpMyAdmin/${phpmyadmin_version}/phpMyAdmin-${phpmyadmin_version}-english.tar.gz
 cd $LSWSDIR/pma/html/
 tar -xzvf pma.tar.gz
-mv phpMyAdmin-4.8.2-english/* ./
+mv phpMyAdmin-${phpmyadmin_version}-english/* ./
 
 #wget -O config.inc.php $GITRAW/conf/config.inc.php
 #sed -i "s/#BLOWFISH#/$PMABLOWFISH/g" config.inc.php
 sed -e "s|cfg\['blowfish_secret'\] = ''|cfg['blowfish_secret'] = '$PMABLOWFISH'|" config.sample.inc.php > config.inc.php
 
 mkdir tmp
-rm -f pma.tar.gz && rm -rf phpMyAdmin-4.8.2-english
+rm -f pma.tar.gz && rm -rf phpMyAdmin-${phpmyadmin_version}-english
 cd /
 chown -R lsadm:lsadm $LSWSDIR/pma/
 
