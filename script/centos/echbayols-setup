@@ -147,7 +147,7 @@ clear
 # Update
 echoG "Update system, please wait..."
 yum -y install epel-release
-yum -y install wget certbot openssl
+yum -y install certbot openssl
 #wget -O /etc/yum.repos.d/MariaDB.repo $GITRAW/repo/MariaDB.repo
 cat > "/etc/yum.repos.d/mariadb.repo" <<END
 # MariaDB $phienbanmariadb CentOS repository list 
@@ -330,11 +330,14 @@ chmod +x /usr/local/lsws/admin/misc/auto_lsws_admpass
 bash /usr/local/lsws/admin/misc/auto_lsws_admpass
 rm -rf /usr/local/lsws/admin/misc/auto_lsws_admpass
 
-#
+# fxibug
 mkdir -p /var/lib/php/session
 chown -R lsadm:lsadm /var/lib/php
 chmod 777 /var/lib/php/session
 chmod 777 $LSWSDIR/pma/html/tmp
+
+# for calc
+yum -y install bc > /dev/null 2>&1
 
 
 clear
@@ -354,7 +357,7 @@ yes | cp -rf $GITRAW/menu/. /etc/echbay/menu/
 
 /opt/echbayols/menu/chmod-755-menu
 
-cat > "/etc/echbay/echbay.version" <<END
+cat > "/etc/echbay/echbayols.version" <<END
 ${echbayols_version}
 END
 
