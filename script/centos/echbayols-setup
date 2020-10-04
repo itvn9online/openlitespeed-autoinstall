@@ -827,7 +827,7 @@ cat >> "/home/echbayols-manage-info.txt" <<END
 
 phpMyAdmin: http://$svip/phpmyadmin/index.php
 
-WebAdmin: http://$svip:$svport
+WebAdmin: https://$svip:$svport
 Username: $usernamebv  
 Password: $matkhaubv 
 
@@ -857,7 +857,7 @@ Sau day la thong tin quan ly server cua ban:
 
 + Lenh goi ECHBAY-OLS: echbay
 + Link phpMyAdmin: http://$svip/phpmyadmin/index.php
-WebAdmin: http://$svip:$svport
+WebAdmin: https://$svip:$svport
 Username: $usernamebv  
 Password: $matkhaubv 
 
@@ -897,7 +897,7 @@ echo "Lenh goi ECHBAY-OLS: echbay"
 echo "--------------------------------------------------------------------------"
 echo "Link phpMyAdmin: http://$svip/phpmyadmin/index.php"
 echo "--------------------------------------------------------------------------"
-echo "WebAdmin: http://$svip:$svport"
+echo "WebAdmin: https://$svip:$svport"
 echo "Username: $usernamebv"
 echo "Password: $matkhaubv"
 echo "--------------------------------------------------------------------------"
