@@ -473,7 +473,7 @@ echo "va gui kem luu y su dung ECHBAY-OLS toi: $echbayolsemail"
 echo "=========================================================================="
 echo "Server se tu khoi dong lai sau 3 giay.... "
 sleep 3
-#reboot
+reboot
 exit
 
 
