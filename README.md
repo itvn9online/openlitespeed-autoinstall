@@ -1,17 +1,17 @@
-## Diễn Đàn Hỗ Trợ Và Xử Lý Bug: 
+## Group support and Fix Bug: 
 ### [https://www.facebook.com/groups/wordpresseb](https://www.facebook.com/groups/wordpresseb)
 
 ### ECHBAY-OLS: EchBay + Open Lite Speed
-### Lệnh Cài Đặt ECHBAY-OLS Trên Centos 7 & 8:
+### Command install ECHBAY-OLS on Centos 7 & 8:
 ```
 bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install )
 ```
 
 ----------------------------------------------
 
-### Phiên bản hệ điều hành khuyên dùng:
-- [x] **`CentOS 7 x64` Khuyên dùng để cho hiệu suất tốt nhất. Mã nguồn ECHBAY-OLS hiện tại đang phát triển chính trên CentOS 7 x64.**
-- [ ] `CentOS 8 x64` MỚI và đang thử nghiệm. Tương lai gần ECHBAY-OLS cũng sẽ phát triển song song cả trên CentOS 8 x64, hiện tại mới đang thử nghiệm.
+### OS recommended:
+- [x] **`CentOS 7 x64` recommended.**
+- [ ] `CentOS 8 x64` test only.
 
 ----------------------------------------------
 
