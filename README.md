@@ -3,10 +3,10 @@
 
 ### ECHBAY-OLS: EchBay + Open Lite Speed
 ### Command install ECHBAY-OLS on Cent OS 7 & 8:
-##### Copy and Paste this line in your fresh install Cent OS 7 or Cent OS 8
 ```
 bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install )
 ```
+> Copy and Paste this line in your fresh install Cent OS 7 or Cent OS 8
 
 ----------------------------------------------
 
