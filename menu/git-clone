@@ -18,7 +18,7 @@ cd ~ ; cd /opt/echbay_vpssim && git pull ; cd ~
 #git merge origin master
 # or clone new
 else
-git clone https://github.com/itvn9online/echbayols /opt/echbayols
+git clone https://github.com/itvn9online/openlitespeed-autoinstall /opt/echbayols
 fi
 
 cd ~
