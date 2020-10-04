@@ -329,8 +329,25 @@ rm -rf /usr/local/lsws/admin/misc/auto_lsws_admpass
 
 #
 mkdir -p /var/lib/php/session
-chmod 777 /var/lib/php/session
+chown -R lsadm:lsadm /var/lib/php
+#chmod 755 /var/lib/php/session
 chmod 777 $LSWSDIR/pma/html/tmp
+
+
+clear
+echoG "Dang Tao ECHBAY-OLS Menu...... "
+sleep 2
+
+rm -rf /etc/motd
+yes | cp -rf $GITRAW/motd /etc/motd
+
+# Download echbay_main_menu
+yes | cp -rf $GITRAW/echbay /bin/echbay && chmod +x /bin/echbay
+
+mkdir -p /etc/echbay/menu ; chmod 755 /etc/echbay/menu
+yes | cp -rf $GITRAW/menu/. /etc/echbay/menu/
+
+/opt/echbayols/menu/chmod-755-menu
 
 
 clear

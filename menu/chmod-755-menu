@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "=========================================================================="
+echo "chomod 755 menu... "
+echo "=========================================================================="
+
+find /etc/echbay/menu -type f -exec chmod 755 {} \;
+
+for d in /etc/echbay/menu/*
+do
+	if [ -d $d ]; then
+		echo $d
+		find $d -type f -exec chmod 755 {} \;
+	fi
+done

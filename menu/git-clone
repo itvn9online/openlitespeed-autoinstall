@@ -12,11 +12,6 @@ sudo yum -y install git
 # update code
 if [ -d /opt/echbayols ]; then
 cd ~ ; cd /opt/echbayols && git pull ; cd ~
-#git commit -m "ECHBAY-VPSSIM commit"
-#git pull origin master
-#git pull origin
-#git merge origin master
-# or clone new
 else
 git clone https://github.com/itvn9online/openlitespeed-autoinstall /opt/echbayols
 fi
