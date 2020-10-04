@@ -5,6 +5,17 @@ GITR_wget_to_copy() {
 yes | cp -rf $2 $1
 }
 
+echoY() {
+    echo -e "\033[38;5;148m${1}\033[39m"
+}
+echoG() {
+    echo -e "\033[38;5;71m${1}\033[39m"
+}
+echoR()
+{
+    echo -e "\033[38;5;203m${1}\033[39m"
+}
+
 # Random Password Generator
 passrootmysql=`date |md5sum |cut -c '1-15'`
 ROOTSQLPWD=$passrootmysql
@@ -43,8 +54,8 @@ svhdd=$( df -h | awk 'NR==2 {print $2}' )
 svswap=$( free -m | awk 'NR==4 {print $2}' )
 free -m
 df -h
-echo "=========================================================================="
-echo "Server info:"
+#echo "=========================================================================="
+echoG "Server info:"
 echo "--------------------------------------------------------------------------"
 echo "Server Type: $(virt-what | awk 'NR==1 {print $NF}')"
 echo "CPU Type: $cpuname"
@@ -62,7 +73,7 @@ read echbayolsemail
 if [ "$echbayolsemail" = "" ]; then
 clear
 echo "=========================================================================="
-echo "Please enter your email!"
+echoY "Please enter your email!"
 echo "-------------------------------------------------------------------------"
 read -p "Press [Enter] to continue..."
 clear
@@ -97,9 +108,9 @@ echbayols_version=`cat /opt/echbayols/echbayols.newversion`
 clear
 
 echo "=========================================================================="
-echo "OS Version: "$current_os_version
+echoG "OS Version: "$current_os_version
 echo "--------------------------------------------------------------------------"
-echo "ECHBAY-OLS will setup Server with info:"
+echoY "ECHBAY-OLS will setup Server with info:"
 echo "=========================================================================="
 echo "eMail Quan Ly: $echbayolsemail"
 echo "--------------------------------------------------------------------------"
@@ -131,8 +142,9 @@ fi
 
 
 # Update
-yum -y install epel-release
-yum -y install wget certbot openssl
+echoG "Update system"
+yum -y install epel-release > /dev/null 2>&1
+yum -y install wget certbot openssl > /dev/null 2>&1
 #wget -O /etc/yum.repos.d/MariaDB.repo $GITRAW/repo/MariaDB.repo
 cat > "/etc/yum.repos.d/mariadb.repo" <<END
 # MariaDB $phienbanmariadb CentOS repository list 
@@ -144,13 +156,15 @@ gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
 END
 rpm -ivh http://rpms.litespeedtech.com/centos/litespeed-repo-1.1-1.el${el_version}.noarch.rpm
-yum -y update
+yum -y update > /dev/null 2>&1
 
 # Install Proftpd
-yum -y install proftpd
+echoG "Install proftpd"
+yum -y install proftpd > /dev/null 2>&1
 sed -i "s/ProFTPD server/$HOSTNAME/g" /etc/proftpd.conf
 
 #Install Openlitespeed & MariaDB
+echoG "Install Openlitespeed & MariaDB"
 mkdir /home/echbayols.demo
 mkdir /home/echbayols.demo/html
 mkdir /home/echbayols.demo/logs
@@ -158,6 +172,7 @@ yum -y install openlitespeed
 yum -y install MariaDB-server MariaDB-client
 
 # Install PHP 72
+echoG "Install PHP"
 #yum -y install lsphp72 lsphp72-common lsphp72-mysqlnd lsphp72-process lsphp72-gd lsphp72-mbstring lsphp72-mcrypt lsphp72-opcache lsphp72-bcmath lsphp72-pdo lsphp72-xml lsphp72-json lsphp72-zip lsphp72-xmlrpc lsphp72-pecl-mcrypt
 install_multi_PHP_version () {
 	if [ ! -d /usr/local/lsws/lsphp${1} ]; then
@@ -216,6 +231,7 @@ EOT
 chown -R nobody:nobody /home/echbayols.demo/html/
 
 # Installing PHPMYAdmin
+echoG "Install PHPMYAdmin"
 mkdir $LSWSDIR/pma
 mkdir $LSWSDIR/pma/{html,logs}
 mkdir $LSWSDIR/conf/vhosts/pma
@@ -231,9 +247,12 @@ cd $LSWSDIR/pma/html/
 tar -xzvf pma.tar.gz
 mv phpMyAdmin-${phpmyadmin_version}-english/* ./
 
-#wget -O config.inc.php $GITRAW/conf/config.inc.php
-#sed -i "s/#BLOWFISH#/$PMABLOWFISH/g" config.inc.php
+# v2
 sed -e "s|cfg\['blowfish_secret'\] = ''|cfg['blowfish_secret'] = '$PMABLOWFISH'|" config.sample.inc.php > config.inc.php
+# v1
+#wget -O config.inc.php $GITRAW/conf/config.inc.php
+GITR_wget_to_copy config.inc.php $GITRAW/conf/config.inc.php
+sed -i "s/#BLOWFISH#/$PMABLOWFISH/g" config.inc.php
 
 mkdir tmp
 rm -f pma.tar.gz && rm -rf phpMyAdmin-${phpmyadmin_version}-english
@@ -247,14 +266,35 @@ openssl req -sha256 -new -key $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/
 openssl x509 -req -sha256 -days 365 -in $LSWSDIR/conf/cert/pma/pma.csr -signkey $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/cert/pma/pma.crt
 
 # Open port Needed in Firewall
-firewall-cmd --zone=public --permanent --add-port=21/tcp
-firewall-cmd --zone=public --permanent --add-port=80/tcp
-firewall-cmd --zone=public --permanent --add-port=443/tcp
-firewall-cmd --zone=public --permanent --add-port=7080/tcp
-firewall-cmd --zone=public --permanent --add-port=8090/tcp
-firewall-cmd --reload
+FIREWALLLIST="21 22 80 443 $svport 8090"
+centos_firewall_add(){
+    echoG 'Setting Firewall'
+    if [ ! -e /usr/sbin/firewalld ]; then 
+        yum -y install firewalld > /dev/null 2>&1
+    fi
+    service firewalld start  > /dev/null 2>&1
+    systemctl enable firewalld > /dev/null 2>&1
+    for PORT in ${FIREWALLLIST}; do 
+        firewall-cmd --zone=public --permanent --add-port=${PORT}/tcp > /dev/null 2>&1
+    done 
+    firewall-cmd --reload > /dev/null 2>&1
+    firewall-cmd --list-all | grep 80 > /dev/null 2>&1
+    if [ ${?} = 0 ]; then 
+        echoG 'firewalld rules setup success'
+    else 
+        echoR 'Please check firewalld rules'    
+    fi         
+}
+#firewall-cmd --zone=public --permanent --add-port=21/tcp
+#firewall-cmd --zone=public --permanent --add-port=80/tcp
+#firewall-cmd --zone=public --permanent --add-port=443/tcp
+#firewall-cmd --zone=public --permanent --add-port=7080/tcp
+#firewall-cmd --zone=public --permanent --add-port=8090/tcp
+#firewall-cmd --reload
+centos_firewall_add
 
 # Generate SSL for Webadmin
+echoG "Generate SSL for Webadmin"
 mkdir $LSWSDIR/conf/cert/admin
 openssl genrsa -out $LSWSDIR/conf/cert/admin/admin.key 2048
 openssl rsa -in $LSWSDIR/conf/cert/admin/admin.key -out $LSWSDIR/conf/cert/admin/admin.key
@@ -278,3 +318,42 @@ ln -s /usr/local/lsws/lsphp72/bin/lsphp /usr/bin/php
 
 systemctl enable proftpd
 systemctl enable mariadb
+
+
+# change admin pass
+#/usr/local/lsws/admin/misc/admpass.sh
+yes | cp -rf /opt/echbayols/menu/auto_lsws_admpass /usr/local/lsws/admin/misc/auto_lsws_admpass
+chmod +x /usr/local/lsws/admin/misc/auto_lsws_admpass
+bash /usr/local/lsws/admin/misc/auto_lsws_admpass
+rm -rf /usr/local/lsws/admin/misc/auto_lsws_admpass
+
+#
+mkdir -p /var/lib/php/session
+chmod 777 /var/lib/php/session
+chmod 777 $LSWSDIR/pma/html/tmp
+
+
+clear
+echo "=========================================================================="
+echoG "ECHBAY-OLS da hoan tat qua trinh cai dat Server. "
+echo "=========================================================================="
+echo "Lenh goi ECHBAY-OLS: echbay"
+echo "--------------------------------------------------------------------------"
+echo "WebAdmin: https://$svip:$svport"
+echo "Username: $usernamebv"
+echo "Password: $matkhaubv"
+echo "--------------------------------------------------------------------------"
+echo "Link phpMyAdmin: https://$svip:8090"
+echo "MySQL root Password: $passrootmysql"
+echo "=========================================================================="
+echo "Thong tin quan ly duoc luu tai: /home/echbayols-manage-info.txt "
+echo "--------------------------------------------------------------------------"
+echo "va gui kem luu y su dung ECHBAY-OLS toi: $echbayolsemail"
+echo "=========================================================================="
+echo "Server se tu khoi dong lai sau 3 giay.... "
+sleep 3
+#reboot
+exit
+
+
+
