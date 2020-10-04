@@ -26,7 +26,7 @@ case "$REPLY" in
 8) clear && /etc/echbay/menu/list-all-soft-version;;
 9) clear && /etc/echbay/menu/nginx-quiche;;
 0) clear && echbay;;
-*) echo "Ban nhap sai, vui long nhap theo so thu tu tren menu !";continue;;
+*) echo "Please slect number on menu!";continue;;
 esac
 done
 

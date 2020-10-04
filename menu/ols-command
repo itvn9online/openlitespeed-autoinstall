@@ -1,0 +1,28 @@
+#!/bin/bash
+
+prompt="Lua chon cua ban (0-Thoat):"
+options=( "Start" "Stop" "Restart" "Status" "Change webmin password" )
+
+/etc/echbay/menu/text-header
+printf "                          OpenLiteSpeed command\n"
+printf "=========================================================================\n"
+
+PS3="$prompt"
+select opt in "${options[@]}" ; do 
+
+case "$REPLY" in
+
+1) cd ~ && /usr/local/lsws/bin/lswsctrl start;;
+2) cd ~ && /usr/local/lsws/bin/lswsctrl stop;;
+3) cd ~ && /usr/local/lsws/bin/lswsctrl restart;;
+4) cd ~ && /usr/local/lsws/bin/lswsctrl status;;
+5) cd ~ && /usr/local/lsws/admin/misc/admpass.sh;;
+0) clear && echbay;;
+*) echo "Please slect number on menu!";continue;;
+
+esac
+
+done
+
+
+

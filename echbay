@@ -35,6 +35,7 @@ options=("Add website                         " \
 "Swap                                " \
 "Cronjob                             " \
 "Extension - Addons                  " \
+"OpenLiteSpeed command               " \
 "Update                              " \
 )
 
@@ -62,7 +63,8 @@ case "$REPLY" in
 5) clear && /etc/echbay/menu/swap/them-xoa-swap-vps-menu;;
 6) clear && /etc/echbay/menu/crontab/cronjob-menu;;
 7) clear && /etc/echbay/menu/tien-ich;;
-8) clear && /etc/echbay/menu/update-upgrade-service-menu;;
+8) clear && /etc/echbay/menu/ols-command;;
+9) clear && /etc/echbay/menu/update-upgrade-service-menu;;
 
 #12) clear && /etc/echbay/menu/vpssim-eroor-menu;;
 #13) clear && /etc/echbay/menu/vpssim-befor-vpssim-config-php.ini-menu;;
@@ -84,7 +86,7 @@ case "$REPLY" in
 #30) clear && cat /etc/motd && killall -g echbay;; 
 #0) clear && cat /etc/motd && killall -g echbay;; 
 0) clear && cat /etc/motd && echbay;; 
-*) echo "Ban nhap sai, vui long nhap theo so thu tu tren menu !";continue;;
+*) echo "Please slect number on menu!";continue;;
 esac
 done
 

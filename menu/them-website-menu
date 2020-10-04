@@ -28,7 +28,7 @@ case "$REPLY" in
 #9) /etc/echbay/menu/echbay-list-website-tren-vps;; 
 #10) clear && echbay;;
 0) clear && echbay;;
-*) echo "Ban nhap sai, vui long nhap theo so thu tu tren menu !";continue;;
+*) echo "Please slect number on menu!";continue;;
 
 esac
 

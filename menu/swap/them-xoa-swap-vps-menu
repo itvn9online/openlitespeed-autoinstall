@@ -23,7 +23,7 @@ case "$REPLY" in
 
 0 ) echo "BYE!";  clear && /bin/echbay;;
 #$(( ${#options[@]}+1 )) ) echo "BYE!";  clear && /bin/echbay;;
-*) echo "Ban nhap sai, vui long nhap cac so trong list tren";continue;;
+*) echo "Please slect number on menu!";continue;;
 
 esac
 

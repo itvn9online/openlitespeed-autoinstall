@@ -24,7 +24,7 @@ case "$REPLY" in
 4 ) /etc/echbay/menu/crontab/crontab-hien-tai;;
 0 ) clear && /bin/echbay;;
 
-*) echo "Ban nhap sai, vui long nhap theo so thu tu tren menu";continue;;
+*) echo "Please slect number on menu!";continue;;
 
 esac
 done
