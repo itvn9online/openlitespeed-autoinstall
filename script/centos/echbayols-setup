@@ -115,6 +115,16 @@ echo "==========================================================================
 echo -n "Confirm continue install (y/N): " 
 read xacnhanthongtin
 
+if [ "$xacnhanthongtin" = "y" ]; then
+echo "--------------------------------------------------------------------------"
+echo "Waiting install ECHBAY-OLS..."
+sleep 2
+else 
+clear
+rm -rf /root/install && bash /root/echbayols-setup
+exit
+fi
+
 
 
 
