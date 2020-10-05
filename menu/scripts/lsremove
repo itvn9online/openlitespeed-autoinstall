@@ -1,16 +1,37 @@
 #!/bin/bash
 
-echo "Domain name (Without www):"
+. /home/echbayols.conf
+
+echo "Domain list:"
+for d in /home/*
+do
+	if [ -d $d ]; then
+#		d=$(($d | cut -c7-100))
+		if [ ! "$d" = "/home/$mainsite" ]; then
+#			echo $d
+			echo $d | cut -c7-100
+		fi
+	fi
+done
+
+echo "========================================================================="
+echo "Enter domain name for remove (Without www):"
 read DOMAIN
 
 DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
-if [ "$DOMAIN" == "" ]; then
+if [ "$DOMAIN" == "0" ] || [ "$DOMAIN" == "" ]; then
 clear
-echo "========================================================================="
-echo "Please enter tour domain and retry!"
-/etc/echbay/menu/scripts/lsremove
-exit
+echo "Cancel remove domain"
+/bin/echbay
 fi
+
+#if [ "$DOMAIN" == "" ]; then
+#clear
+#echo "========================================================================="
+#echo "Please enter your domain and retry!"
+#/etc/echbay/menu/scripts/lsremove
+#exit
+#fi
 
 kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,12}$";
 if [[ ! "$DOMAIN" =~ $kiemtradomain3 ]]; then
@@ -26,6 +47,11 @@ fi
 fi
 
 HOMEDIR="/home/$DOMAIN"
+if [ ! -d $HOMEDIR ]; then
+echo "Domain $DOMAIN not exist on server"
+/etc/echbay/menu/scripts/lsremove
+exit
+fi
 VHOSTDIR="/usr/local/lsws/conf/vhosts/$DOMAIN"
 CERTDIR="/usr/local/lsws/conf/cert/$DOMAIN"
 

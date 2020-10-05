@@ -8,6 +8,12 @@ read DOMAIN
 
 echo "--------------------------------------------------------------------------"
 
+if [ ! -f /usr/local/lsws/conf/vhosts/$DOMAIN/vhconf.conf ]; then
+echo "Domain $DOMAIN vHost not found! Please add domain before create SSL"
+/etc/echbay/menu/scripts/certbot
+exit
+fi
+
 HOMEDIR="/home/$DOMAIN/html"
 
 check_domain_ip=$(ping -c 2 $DOMAIN | head -2 | tail -1 | awk '{print $5}' | sed 's/[(:)]//g')

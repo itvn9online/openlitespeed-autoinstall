@@ -422,8 +422,8 @@ cat >> "/home/ECHBAY-manage-info.txt" <<END
 --- MySQL root Password: $passrootmysql
 
 + Open LiteSpeed control panel: http://$svip:$svport
---- Username: $usernamebv  
---- Password: $matkhaubv 
+--- Username: $usernamebv
+--- Password: $matkhaubv
 
 Chuc ban se thanh cong cung ECHBAY-OLS.
 

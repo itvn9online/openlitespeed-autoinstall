@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Domain name (Without www):"
+echo "Enter new domain name for add new (Without www):"
 read DOMAIN
 
 DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
