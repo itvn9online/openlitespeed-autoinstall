@@ -394,6 +394,7 @@ priport="$svport"
 phpadport="$phpmyadminport"
 serverip="$svip"
 mariadbpass="$passrootmysql"
+FIREWALLLIST="$FIREWALLLIST"
 END
 
 

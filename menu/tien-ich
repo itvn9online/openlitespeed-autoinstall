@@ -2,8 +2,11 @@
 prompt="Lua chon cua ban (0-Thoat):"
 #options=( "Thay Password Root" "Fix Loi Chmod, Chown" "Find Top Largest Files & Folders" "Service Running & Ram Use" "Kiem Tra IP/Nameserver Website" "File Size Converter " "Kiem Tra Thong Tin Server" "Cai Dat Server Timezone" "Install / Remove Imagick" "Install / Remove Ioncube" "Cai Dat Htop" "Backup Config File & Vhost" "Thay Doi Port SSH Number" "Config SSH Timeout" "Block Exploits, SQL Injections" "Deny Run Script In Upload Folder" "Dat Mat Khau Bao Ve Folder" "BAT/TAT Email Thong Bao Login" "BAT/TAT Auto Run echbay" "Canh Bao Full Disc Tren Menu" "Restart Service" "TocDo.net" "Varnish Cache" "Go Bo (Remove) echbay" )
 options=( "Change Port SSH Number           " \
+"Config SSH Timeout                 " \
+"BAT/TAT Email Thong Bao Login      " \
+ "TocDo.net                         " \
 )
-#"Config SSH Timeout" "Block Exploits, SQL Injections" "Deny Run Script In Upload Folder" "Dat Mat Khau Bao Ve Folder" "BAT/TAT Email Thong Bao Login" "BAT/TAT Auto Run echbay" "Canh Bao Full Disc Tren Menu" "Restart Service" "TocDo.net" "Varnish Cache" "Go Bo (Remove) echbay" )
+#"Block Exploits, SQL Injections" "Deny Run Script In Upload Folder" "Dat Mat Khau Bao Ve Folder"  "BAT/TAT Auto Run echbay" "Canh Bao Full Disc Tren Menu" "Restart Service" "Varnish Cache" "Go Bo (Remove) echbay" )
 
 /etc/echbay/menu/text-header
 printf "                           Tien Ich - Addons\n"
@@ -16,6 +19,12 @@ case "$REPLY" in
 
 
 1) /etc/echbay/menu/thay-doi-port-ssh;;
+2) /etc/echbay/menu/bat-tat-ssh-time-out;;
+3) /etc/echbay/menu/bat-tat-email-thong-bao-dang-nhap-server;;
+4) clear && /etc/echbay/menu/toc-do-dot-net;;
+
+
+
 #1) /etc/echbay/menu/echbay-doi-pass-root-vps;;
 #2) /etc/echbay/menu/echbay-sua-loi-chown;;
 #3) /etc/echbay/menu/tienich/echbay-xem-danh-sach-max-dung-luong-file-menu;;
@@ -28,15 +37,12 @@ case "$REPLY" in
 #10) /etc/echbay/menu/tienich/echbay-before-ioncube;;
 #11) /etc/echbay/menu/tienich/echbay-cai-dat-htop;;
 #12) /etc/echbay/menu/echbay-sao-luu-sys;;
-#14) /etc/echbay/menu/echbay-bat-tat-ssh-time-out;;
 #15) /etc/echbay/menu/echbay-block-exploits-sql-injections-menu;;
 #16) /etc/echbay/menu/echbay-chan-run-script-trong-folder-upload-menu;;
 #17) /etc/echbay/menu/echbay-dat-mat-khau-bao-ve-folder-website;;
-#18) /etc/echbay/menu/bat-tat-email-thong-bao-dang-nhap-server;;
 #19) /etc/echbay/menu/echbay-bat-tat-tu-dong-chay-echbay;;
 #20) /etc/echbay/menu/echbay-config-canh-bao-dung-luong-disc-trong-free-it;;
 #21) clear && /etc/echbay/menu/tienich/echbay-restart-service;;
-#22) clear && /etc/echbay/menu/tienich/toc-do-dot-net;;
 #23) clear && /etc/echbay/menu/varnish/install-varnish;;
 #24) /etc/echbay/menu/go-bo-scripts;;
 #	23) clear && echbay;;

@@ -34,7 +34,7 @@ options=("Add website                         " \
 "Free SSL (Let's Enctypt)            " \
 "Swap                                " \
 "Cronjob                             " \
-"Extension - Addons                  " \
+"Addons                              " \
 "OpenLiteSpeed command               " \
 "Update                              " \
 )
