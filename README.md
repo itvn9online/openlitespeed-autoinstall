@@ -6,7 +6,7 @@
 ```
 bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install )
 ```
-> Copy and Paste this line in your fresh install Cent OS 7 or Cent OS 8
+> Copy and Paste this line in your fresh install **CentOS 7** or **CentOS 8**
 
 > This scripts will install:
 - Open Lite Speed web server
