@@ -1,5 +1,67 @@
 #!/bin/bash
 . /home/echbayols.conf
+
+# https://kifarunix.com/how-to-configure-ssh-to-use-a-different-port-on-centos-7/
+
+# function
+add_ssh_port_to_firewall(){
+echo 'Setting Firewall'
+
+#
+#iptables -I INPUT -p tcp --dport ${1} -j ACCEPT
+#service iptables save
+#systemctl restart iptables.service
+
+add_new_port=""
+
+#
+if [ "`systemctl is-active firewalld.service`" == "active" ]; then
+#	if [ ! -e /usr/sbin/firewalld ]; then 
+#		yum -y install firewalld > /dev/null 2>&1
+#	fi
+	service firewalld start  > /dev/null 2>&1
+	systemctl enable firewalld > /dev/null 2>&1
+	firewall-cmd --zone=public --permanent --add-port=${1}/tcp > /dev/null 2>&1
+	firewall-cmd --reload > /dev/null 2>&1
+	firewall-cmd --list-all | grep ${1} > /dev/null 2>&1
+	if [ ${?} = 0 ]; then
+		echo 'firewalld rules setup success'
+		add_new_port="y"
+	else
+		echo 'Please check firewalld rules'
+	fi
+else
+	if [ ! -f /etc/sysconfig/iptables ]; then
+		yum install -y iptables-services
+	fi
+	iptables -I INPUT -p tcp --dport ${1} -j ACCEPT
+	service iptables save
+	/bin/systemctl restart iptables.service
+	portopen=$1
+	if [ "$(iptables -L -n | grep :$portopen | awk 'NR==1 {print $1}')" == "ACCEPT" ]; then
+		echo 'iptables rules setup success'
+		add_new_port="y"
+	else
+		echo 'Please check iptables rules'
+	fi
+fi
+
+if [ "$add_new_port" = "y" ]; then
+	semanage port -a -t ssh_port_t -p tcp ${1}
+	systemctl restart sshd.service
+else
+	# remove new port if faild
+cat > "/tmp/changeportssh" <<END
+sed -i '/Port ${1}/d' /etc/ssh/sshd_config
+sed -i 's/Port ${1}/\#Port ${1}/g' /etc/ssh/sshd_config
+END
+chmod +x /tmp/changeportssh
+/tmp/changeportssh
+rm -rf /tmp/changeportssh
+fi
+}
+
+#
 sshPortdefault=$((grep "Port" /etc/ssh/sshd_config) | head -n 1)
 portcu=$(cat /etc/ssh/sshd_config | grep Port | awk 'END {print $2}')
 if [ ! "$sshPortdefault" == "#Port 22" ]; then
@@ -88,12 +150,7 @@ echo "-------------------------------------------------------------------------"
 echo "please wait...";
 sleep 1
 
-#iptables -I INPUT -p tcp --dport $sshport -j ACCEPT
-#service iptables save
-#systemctl restart iptables.service
-firewall-cmd --zone=public --permanent --add-port=${sshport}/tcp
-firewall-cmd --reload
-/bin/systemctl restart sshd.service
+add_ssh_port_to_firewall $sshport
 
 clear
 echo "========================================================================="
@@ -120,12 +177,7 @@ echo "-------------------------------------------------------------------------"
 echo "please wait...";
 sleep 1
 
-#iptables -I INPUT -p tcp --dport $sshport -j ACCEPT
-#service iptables save
-#systemctl restart iptables.service
-firewall-cmd --zone=public --permanent --add-port=${sshport}/tcp
-firewall-cmd --reload
-/bin/systemctl restart sshd.service
+add_ssh_port_to_firewall $sshport
 
 clear
 echo "========================================================================="
