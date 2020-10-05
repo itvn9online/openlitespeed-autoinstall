@@ -1,18 +1,8 @@
 #!/bin/bash
 
-. /home/echbayols.conf
+#. /home/echbayols.conf
 
-echo "Domain list:"
-for d in /home/*
-do
-	if [ -d $d ]; then
-#		d=$(($d | cut -c7-100))
-		if [ ! "$d" = "/home/$mainsite" ]; then
-#			echo $d
-			echo $d | cut -c7-100
-		fi
-	fi
-done
+/etc/echbay/menu/scripts/lslist
 
 echo "========================================================================="
 echo "Enter domain name for remove (Without www):"

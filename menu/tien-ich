@@ -3,7 +3,7 @@ prompt="Lua chon cua ban (0-Thoat):"
 #options=( "Thay Password Root" "Fix Loi Chmod, Chown" "Find Top Largest Files & Folders" "Service Running & Ram Use" "Kiem Tra IP/Nameserver Website" "File Size Converter " "Kiem Tra Thong Tin Server" "Cai Dat Server Timezone" "Install / Remove Imagick" "Install / Remove Ioncube" "Cai Dat Htop" "Backup Config File & Vhost" "Thay Doi Port SSH Number" "Config SSH Timeout" "Block Exploits, SQL Injections" "Deny Run Script In Upload Folder" "Dat Mat Khau Bao Ve Folder" "BAT/TAT Email Thong Bao Login" "BAT/TAT Auto Run echbay" "Canh Bao Full Disc Tren Menu" "Restart Service" "TocDo.net" "Varnish Cache" "Go Bo (Remove) echbay" )
 options=( "Change Port SSH Number                    " \
 "Config SSH Timeout                             " \
-"ON/OFF Email Thong Bao Login                   " \
+"ON/OFF Email alert SSH Login                   " \
 "TocDo.net                                      " \
 )
 #"Block Exploits, SQL Injections" "Deny Run Script In Upload Folder" "Dat Mat Khau Bao Ve Folder"  "BAT/TAT Auto Run echbay" "Canh Bao Full Disc Tren Menu" "Restart Service" "Varnish Cache" "Go Bo (Remove) echbay" )

@@ -9,13 +9,20 @@ echo "Database Name:"
 read DBNAME
 
 DBNAME=`echo $DBNAME | tr '[A-Z]' '[a-z]'`
-if [ "$DBNAME" = "" ]; then
+if [ "$DBNAME" == "0" ] || [ "$DBNAME" == "" ]; then
 clear
-echo "========================================================================="
-echo "Please enter your database name and retry!"
-/etc/echbay/menu/scripts/createdb
-exit
+echo "Cancel create new database"
+/bin/echbay
 fi
+
+#if [ "$DBNAME" = "" ]; then
+#clear
+#echo "========================================================================="
+#echo "Please enter your database name and retry!"
+#/etc/echbay/menu/scripts/createdb
+#exit
+#fi
+
 if [[ $DBNAME =~ ^[0-9]+$ ]]; then
 clear
 echo "========================================================================="

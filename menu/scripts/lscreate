@@ -1,16 +1,27 @@
 #!/bin/bash
 
+#. /home/echbayols.conf
+
+/etc/echbay/menu/scripts/lslist
+
+echo "========================================================================="
 echo "Enter new domain name for add new (Without www):"
 read DOMAIN
 
 DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
-if [ "$DOMAIN" == "" ]; then
+if [ "$DOMAIN" == "0" ] || [ "$DOMAIN" == "" ]; then
 clear
-echo "========================================================================="
-echo "Please enter your domain and retry!"
-/etc/echbay/menu/scripts/lscreate
-exit
+echo "Cancel add domain"
+/bin/echbay
 fi
+
+#if [ "$DOMAIN" == "" ]; then
+#clear
+#echo "========================================================================="
+#echo "Please enter your domain and retry!"
+#/etc/echbay/menu/scripts/lscreate
+#exit
+#fi
 
 kiemtradomain3="^([[:alnum:]]([[:alnum:]\-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,12}$";
 if [[ ! "$DOMAIN" =~ $kiemtradomain3 ]]; then

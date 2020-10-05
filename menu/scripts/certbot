@@ -1,15 +1,30 @@
 #!/bin/bash
-. /home/echbayols.conf
 
-echo "Make sure you create vhost with /scripts/lscreate."
+#. /home/echbayols.conf
+
+/etc/echbay/menu/scripts/lslist
+
+echo "========================================================================="
+#echo "Make sure you create vhost with /scripts/lscreate."
 echo "Make your domain is correct pointing to this IP: $serverip"
-echo "Domain name (Without www):"
+echo "Enter domain name for create SSL (Without www):"
 read DOMAIN
+
+DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
+if [ "$DOMAIN" == "0" ] || [ "$DOMAIN" == "" ]; then
+clear
+echo "Cancel create SSL domain"
+/bin/echbay
+fi
 
 echo "--------------------------------------------------------------------------"
 
 if [ ! -f /usr/local/lsws/conf/vhosts/$DOMAIN/vhconf.conf ]; then
 echo "Domain $DOMAIN vHost not found! Please add domain before create SSL"
+/etc/echbay/menu/scripts/certbot
+exit
+elif [ ! -d /home/$DOMAIN ]; then
+echo "Domain $DOMAIN home dir not found! Please add domain before create SSL"
 /etc/echbay/menu/scripts/certbot
 exit
 fi
