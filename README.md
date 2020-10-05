@@ -1,7 +1,7 @@
 ## Group support and Fix Bug: 
 ### [https://www.facebook.com/groups/wordpresseb](https://www.facebook.com/groups/wordpresseb)
 
-### ECHBAY-OLS: EchBay script for Open Lite Speed
+### ECHBAY-OLS: EchBay simple script for Open Lite Speed
 ### Command install ECHBAY-OLS on CentOS 7 & 8:
 ```
 bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/install )
