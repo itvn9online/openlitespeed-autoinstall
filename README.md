@@ -20,7 +20,7 @@ bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-auto
 - Create Free SSL (Let's Enctypt)
 - Addons: change SSH port...
 - Start|stop|restart|reload Open Litespeed web server
-- ............
+- . . . . .
 
 ----------------------------------------------
 
