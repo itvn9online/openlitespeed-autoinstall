@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#. /home/echbayols.conf
+. /home/echbayols.conf
 
 /etc/echbay/menu/scripts/lslist
 
