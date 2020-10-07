@@ -1,4 +1,6 @@
 #!/bin/sh
+
+printf "=========================================================================\n"
 prompt="Nhap lua chon cua ban (0-Thoat):"
 options=("Add Crontab" "Remove Crontab" "Remove all Crontab" "List Crontab")
 

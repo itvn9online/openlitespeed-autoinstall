@@ -1,5 +1,6 @@
 #!/bin/bash
 
+printf "=========================================================================\n"
 prompt="Lua chon cua ban (0-Thoat):"
 #options=( "Update System" "Update ECHBAY-OLS" "Update Nginx" "Change phpMyAdmin Version" "Change PHP Version" "Update OpenSSL version" "Reset code form git" "List soft version" "Nginx quiche")
 options=( "Update System" "Update ECHBAY-OLS")
