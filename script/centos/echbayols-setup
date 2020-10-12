@@ -104,7 +104,8 @@ passrootmysql="$passrootmysql"
 END
 
 echbayols_version=`cat /opt/echbayols/echbayols.newversion`
-php_version_install="73"
+php_version_install="72"
+#php_version_install="73"
 
 
 clear
@@ -191,6 +192,8 @@ mkdir /home/echbayols.demo/html
 mkdir /home/echbayols.demo/logs
 yum -y install openlitespeed
 yum -y install MariaDB-server MariaDB-client
+
+sleep 5
 
 # Install PHP
 echoG "Install PHP "$php_version_install
