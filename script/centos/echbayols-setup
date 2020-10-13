@@ -477,7 +477,7 @@ clear
 echo "=========================================================================="
 echoG "ECHBAY-OLS da hoan tat qua trinh cai dat Server. "
 echo "=========================================================================="
-echo "Lenh goi ECHBAY-OLS: echbay"
+echo "Call ECHBAY-OLS: echbay"
 echo "--------------------------------------------------------------------------"
 echo "WebAdmin: https://$svip:$svport"
 echo "Username: $usernamebv"
@@ -486,11 +486,11 @@ echo "--------------------------------------------------------------------------
 echo "Link phpMyAdmin: https://$svip:$phpmyadminport"
 echo "MySQL root Password: $passrootmysql"
 echo "=========================================================================="
-echo "Thong tin quan ly duoc luu tai: /home/echbayols-manage-info.txt "
+echo "All control info save in: /home/echbayols-manage-info.txt "
 echo "--------------------------------------------------------------------------"
-echo "va gui kem luu y su dung ECHBAY-OLS toi: $echbayolsemail"
+echo "and send email to: $echbayolsemail"
 echo "=========================================================================="
-echo "Server se tu khoi dong lai sau 3 giay.... "
+echo "Server auto restart after 3 second... "
 sleep 3
 reboot
 exit
