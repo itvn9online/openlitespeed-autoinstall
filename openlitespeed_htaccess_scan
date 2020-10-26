@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ ! find /home/*/domains/*/*_html/ -maxdepth 2 -type f -newer /usr/local/lsws/cgid -name '.htaccess' -exec false {} + ]; then
+/usr/local/lsws/bin/lswsctrl restart;
+fi
+
+
