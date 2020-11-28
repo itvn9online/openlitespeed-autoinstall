@@ -373,6 +373,7 @@ systemctl enable mariadb
 
 # neu ftp chua duoc cai dat thi cai thoi
 if [ ! -f /etc/proftpd.conf ]; then
+echoG "Install pure ftpd"
 /opt/echbayols/menu/ftp-server-install
 fi
 
