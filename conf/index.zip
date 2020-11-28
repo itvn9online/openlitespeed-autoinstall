@@ -1,0 +1,4 @@
+<?php
+echo "Webcome to EchBay OpenLiteSpeed Hosting!";
+echo phpversion();
+echo __FILE__ . ':' . __LINE__;

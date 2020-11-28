@@ -248,11 +248,17 @@ GITR_wget_to_copy $LSWSDIR/conf/templates/vhconf.conf $GITRAW/templates/vhconf.c
 # Create Content in Homedir and logs
 touch /home/echbayols.demo/html/.htaccess
 touch /home/echbayols.demo/logs/{error.log,access.log}
+if [ -f /opt/echbayols/conf/index.zip ]; then
+yes | cp -rf /opt/echbayols/conf/index.zip /home/echbayols.demo/html/index.php
+else
 cat << EOT > /home/echbayols.demo/html/index.php
 <?php
-echo "Its Works!";
+echo "Webcome to EchBay OpenLiteSpeed Hosting!";
+echo phpversion();
+echo __FILE__ . ':' . __LINE__;
 ?>
 EOT
+fi
 chown -R nobody:nobody /home/echbayols.demo/html/
 
 # Installing PHPMYAdmin

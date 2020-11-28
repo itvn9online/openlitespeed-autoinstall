@@ -91,12 +91,17 @@ mkdir -p $HOMEDIR/html/.well-known
 #touch $HOMEDIR/html/.htaccess
 yes | cp -rf /etc/echbay/htaccess.txt $HOMEDIR/html/.htaccess
 touch /$HOMEDIR/logs/{error.log,access.log}
+if [ -f /opt/echbayols/conf/index.zip ]; then
+yes | cp -rf /opt/echbayols/conf/index.zip $HOMEDIR/html/index.php
+else
 cat << EOT > $HOMEDIR/html/index.php
 <?php
 echo "Webcome to EchBay OpenLiteSpeed Hosting!";
 echo phpversion();
+echo __FILE__ . ':' . __LINE__;
 ?>
 EOT
+fi
 
 # Modify LS config file
 yes | cp -rf $SERVERROOT/conf/templates/incl.conf $SERVERROOT/conf/templates/$DOMAIN.conf
