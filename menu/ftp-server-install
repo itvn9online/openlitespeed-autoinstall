@@ -64,6 +64,9 @@ yes | cp -rf /etc/pki/pure-ftpd/pure-ftpd.pem /etc/echbay/pure-ftpd.pem
 fi
 fi
 
+#
+yes | cp -rf /opt/echbayols/conf/pure-ftpd.conf /etc/pure-ftpd/pure-ftpd.conf
+
 if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then 
 chkconfig pure-ftpd on
 service pure-ftpd start
