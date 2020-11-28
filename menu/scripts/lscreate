@@ -62,7 +62,7 @@ fi
 #echo "TEST TEST TEST TEST TEST TEST..." ; exit
 
 #
-if [ ! "$USERNAME" = "" ]; then
+if [ ! "$USERNAME" = "" ] && [ ! -f /etc/proftpd.conf ]; then
 HOMEDIR="/home/$USERNAME"
 else
 HOMEDIR="/home/$DOMAIN"
