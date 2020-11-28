@@ -72,7 +72,7 @@ SERVERROOT="/usr/local/lsws"
 DOMAINCONF="$SERVERROOT/conf/templates/$DOMAIN.conf"
 
 #
-if [ -d $HOMEDIR ]; then
+if [ -d $HOMEDIR ] || [ -d $SERVERROOT/conf/vhosts/$DOMAIN ]; then
 clear
 echo "Domain exist"
 /etc/echbay/menu/scripts/lscreate
