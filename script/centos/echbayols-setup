@@ -358,8 +358,10 @@ ln -s /usr/local/lsws/lsphp${php_version_install}/bin/lsphp /usr/bin/php
 systemctl enable mariadb
 
 
-#
+# neu ftp chua duoc cai dat thi cai thoi
+if [ ! -f /etc/proftpd.conf ]; then
 /opt/echbayols/menu/ftp-server-install
+fi
 
 
 # change admin pass

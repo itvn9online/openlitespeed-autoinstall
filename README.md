@@ -13,7 +13,7 @@ bash <( curl -k https://raw.githubusercontent.com/itvn9online/openlitespeed-auto
 - ProFTPD
 - MariaDB 10.2
 - PHP 7.2
-- PHPMyAdmin 4.9.5
+- PHPMyAdmin 5.0.4
 
 > Simple Scripts to:
 - Create vHost

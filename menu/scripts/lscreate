@@ -5,8 +5,12 @@
 /etc/echbay/menu/scripts/lslist
 
 echo "========================================================================="
-echo "Enter new domain name for add new (Without www):"
-read DOMAIN
+if [ ! "$1" = "" ]; then
+	DOMAIN=$1
+else
+	echo "Enter new domain name for add new (Without www):"
+	read DOMAIN
+fi
 
 DOMAIN=`echo $DOMAIN | tr '[A-Z]' '[a-z]'`
 if [ "$DOMAIN" == "0" ] || [ "$DOMAIN" == "" ]; then
@@ -36,35 +40,63 @@ exit
 fi
 fi
 
-echo "FTP Username (empty for skip create FTP account):"
-read USERNAME
-if [ ! "$USERNAME" = "" ]; then
-echo "FTP Password:"
-read PASSWORD
+if [ ! "$2" = "" ]; then
+	USERNAME=$2
+else
+	echo "FTP Username (empty for skip create FTP account):"
+	read USERNAME
 fi
 
-HOMEDIR="/home/$DOMAIN"
+if [ ! "$USERNAME" = "" ]; then
+	if [ ! "$3" = "" ]; then
+		PASSWORD=$3
+	else
+		echo "FTP Password:"
+		read PASSWORD
+	fi
+fi
+
+#echo $DOMAIN
+#echo $USERNAME
+#echo $PASSWORD
+#echo "TEST TEST TEST TEST TEST TEST..." ; exit
+
+#
+#HOMEDIR="/home/$USERNAME/$DOMAIN"
+HOMEDIR="/home/$USERNAME"
+#echo $HOMEDIR ; exit
 SERVERROOT="/usr/local/lsws"
 DOMAINCONF="$SERVERROOT/conf/templates/$DOMAIN.conf"
 
+# tao file theo ten mien duoc add
+echo $(date) > "/home/$USERNAME/$DOMAIN.txt"
+
 # Create directory
-mkdir $HOMEDIR
-mkdir $HOMEDIR/{html,logs}
-mkdir $SERVERROOT/conf/vhosts/$DOMAIN
-mkdir $SERVERROOT/conf/cert/$DOMAIN
+mkdir -p $HOMEDIR
+mkdir -p $HOMEDIR/{html,logs}
+mkdir -p $SERVERROOT/conf/vhosts/$DOMAIN
+mkdir -p $SERVERROOT/conf/cert/$DOMAIN
+
+#
+mkdir -p $HOMEDIR/html/.well-known/acme-challenge
+mkdir -p $HOMEDIR/html/.well-known/pki-validation
+mkdir -p $HOMEDIR/html/.well-known
+
+#echo "TEST TEST TEST TEST TEST TEST..." ; exit
 
 # Create file
-touch $HOMEDIR/html/.htaccess
+#touch $HOMEDIR/html/.htaccess
+yes | cp -rf /etc/echbay/htaccess.txt $HOMEDIR/html/.htaccess
 touch /$HOMEDIR/logs/{error.log,access.log}
 cat << EOT > $HOMEDIR/html/index.php
 <?php
-echo "Its Works!";
+echo "Webcome to EchBay OpenLiteSpeed Hosting!";
 ?>
 EOT
 
 # Modify LS config file
-cp $SERVERROOT/conf/templates/incl.conf $SERVERROOT/conf/templates/$DOMAIN.conf
-cp $SERVERROOT/conf/templates/vhconf.conf $SERVERROOT/conf/vhosts/$DOMAIN/vhconf.conf
+yes | cp -rf $SERVERROOT/conf/templates/incl.conf $SERVERROOT/conf/templates/$DOMAIN.conf
+yes | cp -rf $SERVERROOT/conf/templates/vhconf.conf $SERVERROOT/conf/vhosts/$DOMAIN/vhconf.conf
 sed -i "s/##DOMAIN##/$DOMAIN/g" $SERVERROOT/conf/templates/$DOMAIN.conf
 sed -i "s/##DOMAIN##/$DOMAIN/g" $SERVERROOT/conf/vhosts/$DOMAIN/vhconf.conf
 sed -i "/echbayols.demo[[:space:]][*]/a \  map                     $DOMAIN $DOMAIN" $SERVERROOT/conf/httpd_config.conf
@@ -77,9 +109,54 @@ openssl rsa -in $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.key -out $SERVERROOT/conf/
 openssl req -sha256 -new -key $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.key -out $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.csr -subj "/CN=$DOMAIN"
 openssl x509 -req -sha256 -days 365 -in $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.csr -signkey $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.key -out $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.crt
 
-# Create FTP User
+# Create FTP User -> PureFTPD
+add_ftp_user_pure(){
+
+user=$USERNAME
+passwd=$PASSWORD
+udir="/home/$USERNAME"
+dm_str_login="sbin/nologin"
+#ma_hoa_public_user_dir="8705079b8deaa02006a160f0342f05b0"
+#file_name_to_index_download="index"
+#domain="wp25882.s146.echbay.com"
+#dir_for_nginx_domain="/etc/nginx"
+#dm_id="25882"
+#dir_for_nginx_centmin_domain="/usr/local/nginx/conf"
+#act="process"
+
+#
+id -u $user
+if [ $? -eq 0 ]; then
+echo "user_exist"
+else
+#echo "user_does_not_exist"
+/usr/sbin/useradd $user
+/usr/sbin/usermod -d $udir $user
+echo $user:$passwd | /usr/sbin/chpasswd
+fi
+/usr/sbin/usermod -s /$dm_str_login $user
+if [ -f /etc/pure-ftpd/pure-ftpd.conf ]; then
+if [ ! -f /etc/pure-ftpd/pureftpd.passwd ]; then
+touch /etc/pure-ftpd/pureftpd.passwd
+fi
+if [ "$(pure-pw list | grep $udir)" == "" ]; then
+( echo ${passwd} ; echo ${passwd} ) | pure-pw useradd $user -u nginx -g nginx -d $udir -m
+pure-pw mkdb
+pure-pw mkdb
+fi
+fi
+
+}
+
+# Create FTP User -> ProFTPD
 if [ ! "$USERNAME" = "" ]; then
+
+if [ -f /etc/pure-ftpd/pure-ftpd.conf ]; then
+add_ftp_user_pure
+elif [ -f /etc/proftpd.conf ]; then
 useradd $USERNAME -d /home/$DOMAIN -p $(echo $PASSWORD | openssl passwd -1 -stdin) -M
+fi
+
 fi
 
 # Fix Permission
