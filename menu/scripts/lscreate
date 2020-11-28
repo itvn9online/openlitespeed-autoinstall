@@ -71,9 +71,6 @@ fi
 SERVERROOT="/usr/local/lsws"
 DOMAINCONF="$SERVERROOT/conf/templates/$DOMAIN.conf"
 
-# tao file theo ten mien duoc add
-echo $(date) > "/home/$USERNAME/$DOMAIN.txt"
-
 # Create directory
 mkdir -p $HOMEDIR
 mkdir -p $HOMEDIR/{html,logs}
@@ -84,6 +81,9 @@ mkdir -p $SERVERROOT/conf/cert/$DOMAIN
 mkdir -p $HOMEDIR/html/.well-known/acme-challenge
 mkdir -p $HOMEDIR/html/.well-known/pki-validation
 mkdir -p $HOMEDIR/html/.well-known
+
+# tao file theo ten mien duoc add
+echo $(date) > "$HOMEDIR/$DOMAIN.txt"
 
 #echo "TEST TEST TEST TEST TEST TEST..." ; exit
 
