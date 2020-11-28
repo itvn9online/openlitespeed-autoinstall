@@ -182,6 +182,7 @@ chown -R lsadm:lsadm $SERVERROOT/conf/templates/
 
 # Reload
 /usr/local/lsws/bin/lswsctrl reload
+/usr/local/lsws/bin/lswsctrl restart
 echo -e $DOMAIN:$HOMEDIR >> $SERVERROOT/domain
 echo =================================================
 echo Done!
