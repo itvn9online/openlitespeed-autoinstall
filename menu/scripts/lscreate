@@ -154,7 +154,8 @@ if [ ! "$USERNAME" = "" ]; then
 if [ -f /etc/pure-ftpd/pure-ftpd.conf ]; then
 add_ftp_user_pure
 elif [ -f /etc/proftpd.conf ]; then
-useradd $USERNAME -d /home/$DOMAIN -p $(echo $PASSWORD | openssl passwd -1 -stdin) -M
+#/usr/sbin/useradd $USERNAME -d /home/$DOMAIN -p $(echo $PASSWORD | openssl passwd -1 -stdin) -M
+/usr/sbin/useradd $USERNAME -d $HOMEDIR -p $(echo $PASSWORD | openssl passwd -1 -stdin) -M
 fi
 
 fi
