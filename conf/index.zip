@@ -1,4 +1,4 @@
 <?php
-echo "Webcome to EchBay OpenLiteSpeed Hosting!";
-echo phpversion();
+echo 'Webcome to EchBay OpenLiteSpeed Hosting!<br>';
+echo phpversion() . '<br>';
 echo __FILE__ . ':' . __LINE__;
