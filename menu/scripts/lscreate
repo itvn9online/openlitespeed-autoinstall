@@ -88,8 +88,11 @@ echo $(date) > "$HOMEDIR/$DOMAIN.txt"
 #echo "TEST TEST TEST TEST TEST TEST..." ; exit
 
 # Create file
-#touch $HOMEDIR/html/.htaccess
-yes | cp -rf /etc/echbay/htaccess.txt $HOMEDIR/html/.htaccess
+if [ -f /opt/echbayols/conf/htaccess.txt ]; then
+yes | cp -rf /opt/echbayols/conf/htaccess.txt $HOMEDIR/html/.htaccess
+else
+touch $HOMEDIR/html/.htaccess
+fi
 touch /$HOMEDIR/logs/{error.log,access.log}
 if [ -f /opt/echbayols/conf/index.zip ]; then
 yes | cp -rf /opt/echbayols/conf/index.zip $HOMEDIR/html/index.php
