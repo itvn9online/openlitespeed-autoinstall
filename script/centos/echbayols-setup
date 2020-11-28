@@ -181,9 +181,9 @@ rpm -ivh http://rpms.litespeedtech.com/centos/litespeed-repo-1.1-1.el${el_versio
 yum -y update
 
 # Install Proftpd
-#echoG "Install proftpd"
-#yum -y install proftpd
-#sed -i "s/ProFTPD server/$HOSTNAME/g" /etc/proftpd.conf
+echoG "Install proftpd"
+yum -y install proftpd
+sed -i "s/ProFTPD server/$HOSTNAME/g" /etc/proftpd.conf
 
 #Install Openlitespeed & MariaDB
 echoG "Install Openlitespeed & MariaDB"
@@ -338,7 +338,7 @@ openssl x509 -req -sha256 -days 365 -in $LSWSDIR/conf/cert/admin/admin.csr -sign
 
 #Setting MySQL
 systemctl start mariadb
-#systemctl start proftpd
+systemctl start proftpd
 $LSWSDIR/bin/lswsctrl start
 mysql -uroot -v -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
 mysql -uroot -v -e "DROP DATABASE test;"
@@ -354,7 +354,7 @@ EOT
 #ln -s /usr/local/lsws/lsphp72/bin/lsphp /usr/bin/php
 ln -s /usr/local/lsws/lsphp${php_version_install}/bin/lsphp /usr/bin/php
 
-#systemctl enable proftpd
+systemctl enable proftpd
 systemctl enable mariadb
 
 
