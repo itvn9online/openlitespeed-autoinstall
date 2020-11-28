@@ -1,83 +1,129 @@
 #!/bin/sh
 
-if [ $(id -u) != "0" ]; then
-    echo "ERROR: script run with root user only, please login with user root!"
-    exit
+# for etime.vn
+# chuyển về thư mục root trước khi làm việc
+cd ~
+# tạo thư mục chỉ cần thêm tham số -p, nếu chưa có thư mục cha nó sẽ tự tạo
+mkdir -p /home/user25882/wp25882.s146.echbay.com
+mkdir -p /home/user25882/www
+mkdir -p /home/user25882/8705079b8deaa02006a160f0342f05b0
+mkdir -p /home/user25882/8705079b8deaa02006a160f0342f05b0/.well-known/acme-challenge
+mkdir -p /home/user25882/8705079b8deaa02006a160f0342f05b0/.well-known/pki-validation
+mkdir -p /home/user25882/8705079b8deaa02006a160f0342f05b0/.well-known
+mkdir -p /home/user25882
+mkdir -p /home/logs/user25882 ; chown -R root:nginx /home/logs/user25882 ; chmod 711 /home/logs/user25882
+if [ ! -f /home/logs/user25882/error_log ]; then
+touch /home/logs/user25882/error_log
+fi
+chmod 777 /home/logs/user25882/error_log
+if [ ! -f /home/logs/user25882/access_log ]; then
+touch /home/logs/user25882/access_log
+fi
+chmod 777 /home/logs/user25882/access_log
+chown -R root:nginx /home/logs/user25882/*
+# list các tên miền của hosting
+if [ ! -f /home/user25882/etime.echbay.net.txt ]; then
+touch /home/user25882/etime.echbay.net.txt
+fi
+chmod 644 /home/user25882/etime.echbay.net.txt
+# list các tên miền của hosting
+if [ ! -f /home/user25882/wp25882.s146.echbay.com.txt ]; then
+touch /home/user25882/wp25882.s146.echbay.com.txt
+fi
+chmod 644 /home/user25882/wp25882.s146.echbay.com.txt
+# list các tên miền của hosting
+if [ ! -f /home/user25882/v2.etime.vn.txt ]; then
+touch /home/user25882/v2.etime.vn.txt
+fi
+chmod 644 /home/user25882/v2.etime.vn.txt
+# list các tên miền của hosting
+if [ ! -f /home/user25882/etime.vn.txt ]; then
+touch /home/user25882/etime.vn.txt
+fi
+chmod 644 /home/user25882/etime.vn.txt
+# run
+str_for_download_nginx () {
+if [ -d /usr/local/nginx/conf ]; then
+wget --no-check-certificate -q "http://api.echbay.com/server/conf/index_v2.php?domain_id=25882&file=nginx_domain_centminmod&rand=1606577194" -O ft.txt
+chmod 644 ft.txt
+else
+wget --no-check-certificate -q "http://api.echbay.com/server/conf/index_v2.php?domain_id=25882&file=nginx_domain_vpssim&rand=1606577194" -O ft.txt
+chmod 644 ft.txt
+fi
+mv -f ft.txt /etc/nginx/conf.d/25882.conf
+}
+user="user25882"
+passwd="ce5df5f1662"
+udir="/home/user25882"
+dm_str_login="sbin/nologin"
+ma_hoa_public_user_dir="8705079b8deaa02006a160f0342f05b0"
+file_name_to_index_download="index"
+domain="wp25882.s146.echbay.com"
+dir_for_nginx_domain="/etc/nginx"
+dm_id="25882"
+dir_for_nginx_centmin_domain="/usr/local/nginx/conf"
+act="process"
+id -u $user
+if [ $? -eq 0 ]; then
+remoteMesage="user_exist"
+else
+remoteMesage="user_does_not_exist"
+/usr/sbin/useradd $user
+/usr/sbin/usermod -d $udir $user
+echo $user:$passwd | /usr/sbin/chpasswd
+fi
+/usr/sbin/usermod -s /$dm_str_login $user
+if [ -f /etc/pure-ftpd/pure-ftpd.conf ]; then
+if [ ! -f /etc/pure-ftpd/pureftpd.passwd ]; then
+touch /etc/pure-ftpd/pureftpd.passwd
+fi
+if [ "$(pure-pw list | grep $udir)" == "" ]; then
+( echo ${passwd} ; echo ${passwd} ) | pure-pw useradd $user -u nginx -g nginx -d $udir -m
+pure-pw mkdb
+pure-pw mkdb
+fi
 fi
 
-# find another control panel if exist
-detected_control=""
-if [ -f /var/cpanel/cpanel.config ]; then
-detected_control="WHM/Cpanel"
-elif [ -f /etc/psa/.psa.shadow ]; then
-detected_control="Plesk"
-elif [ -f /etc/init.d/directadmin ]; then
-detected_control="DirectAdmin"
-elif [ -f /etc/init.d/webmin ]; then
-detected_control="WebMin"
-elif [ -f /home/echbayols.conf ]; then
-detected_control="ECHBAY-OLS"
-rm -rf install*
-fi
-
-if [ ! "$detected_control" == "" ]; then
-clear
-echo "========================================================================="
-echo $detected_control" detected in your server, if you want continue"
-echo "Reinstall OS and retry (recommended CentOS 7 - 64bit)"
-echo "Good bye and see again!"
-echo "========================================================================="
-exit
-fi
-
-arch=`uname -m`
-if [ ! "$arch" = "x86_64" ]; then
-clear
-echo "========================================================================="
-echo "ECHBAY-OLS run only in OS x64"
-echo "Please reinstall OS x86_64 and retry"
-echo "Good bye and see again!"
-echo "========================================================================="
-rm -rf install*
-exit
-fi
-
-#if [ -f /etc/yum.repos.d/epel.repo ]; then
-#sudo sed -i "s/mirrorlist=https/mirrorlist=http/" /etc/yum.repos.d/epel.repo
-#fi
-
-yes | cp -rf /opt/echbayols/calc /bin/calc && chmod +x /bin/calc
-clear  
-rm -rf ~/echbayols*
-
-echo "========================================================================="
-echo "ECHBAY-OLS run only in Centos 7 & Centos 8 x64"
-echo "-------------------------------------------------------------------------"
-echo "Recommended using Centos 7 x64."
-echo "-------------------------------------------------------------------------"
-echo "========================================================================="
-
-current_os_version=$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))
-#echo $current_os_version
 
 cd ~
-echo "----------------------------------------------------------------------------"
-echo "Please wait ..."
-sleep 2
-
-if [ "$current_os_version" == "5" ] || [ "$current_os_version" == "6" ]; then
-clear
-echo "========================================================================="
-echo "ECHBAY-OLS run only in Centos 7 & Centos 8 x64"
-echo "Please reinstall OS x86_64 and retry"
-echo "Good bye and see again!"
-echo "========================================================================="
-rm -rf install*
-exit
-#elif [ "$current_os_version" == "7" ]; then
-#yes | cp -rf /opt/echbayols/script/centos/${current_os_version}/echbayols-setup ~/echbayols-setup ; chmod +x echbayols-setup ; clear ; bash echbayols-setup
+if [ ! -f $udir/$ma_hoa_public_user_dir/index.php ]; then
+wget "http://$apiEchbayCom/server/conf/index.php?download=1&file=$file_name_to_index_download" -O ft.txt ; chmod 644 ft.txt
+mv -f ft.txt $udir/$ma_hoa_public_user_dir/index.php
+fi
+chown $user:$user $udir
+chown -R $user:nginx $udir/*
+chmod 711 $udir/
+remoteMesage="create_account"
+cd ~
+str_for_download_nginx
+cd ~
+EB_sbin_service_nginx_stop $centOsVersion
+EB_sbin_service_nginx_start $centOsVersion
+# check and fixed nginx vhost
+remove_conf_file_by_nginx_error () {
+if [ -f $1 ]; then
+rm -rf $1
+fi
+}
+check_nginx_status_after_update_vhost () {
+remove_conf_file_by_nginx_error $dir_for_nginx_domain"/conf.d/"$dm_id".conf"
+remove_conf_file_by_nginx_error $dir_for_nginx_domain"/conf.d/"$domain".conf"
+remove_conf_file_by_nginx_error $dir_for_nginx_centmin_domain"/conf.d/"$dm_id".conf"
+remove_conf_file_by_nginx_error $dir_for_nginx_centmin_domain"/conf.d/"$domain".conf"
+EB_sbin_service_nginx_start $centOsVersion
+remoteMesage="nginx_rule_faild_remove_domain"
+}
+if [ "$centOsVersion" == "6" ]; then
+if [[ $(/sbin/service nginx status) = *"stopped"* ]]; then
+check_nginx_status_after_update_vhost
 else
-#yes | cp -rf /opt/echbayols/script/centos/8/echbayols-setup ~/echbayols-setup ; chmod +x echbayols-setup ; clear ; bash echbayols-setup
-yes | cp -rf /opt/echbayols/script/centos/echbayols-setup ~/echbayols-setup ; chmod +x echbayols-setup ; clear ; bash echbayols-setup
+remoteMesage="update_nginx_config_"$act
+fi
+else
+if [ "`/bin/systemctl is-active nginx.service`" == "active" ]; then
+remoteMesage="update_nginx_config_"$act
+else
+check_nginx_status_after_update_vhost
+fi
 fi
 
