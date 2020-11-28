@@ -62,8 +62,11 @@ fi
 #echo "TEST TEST TEST TEST TEST TEST..." ; exit
 
 #
-#HOMEDIR="/home/$USERNAME/$DOMAIN"
+if [ ! "$USERNAME" = "" ]; then
 HOMEDIR="/home/$USERNAME"
+else
+HOMEDIR="/home/$DOMAIN"
+fi
 #echo $HOMEDIR ; exit
 SERVERROOT="/usr/local/lsws"
 DOMAINCONF="$SERVERROOT/conf/templates/$DOMAIN.conf"
