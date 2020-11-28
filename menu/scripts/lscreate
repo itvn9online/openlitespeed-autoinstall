@@ -71,6 +71,13 @@ fi
 SERVERROOT="/usr/local/lsws"
 DOMAINCONF="$SERVERROOT/conf/templates/$DOMAIN.conf"
 
+#
+if [ -d $HOMEDIR ]; then
+clear
+echo "Domain exist"
+/etc/echbay/menu/scripts/lscreate
+fi
+
 # Create directory
 mkdir -p $HOMEDIR
 mkdir -p $HOMEDIR/{html,logs}
