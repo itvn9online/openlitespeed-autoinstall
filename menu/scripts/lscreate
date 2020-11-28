@@ -94,6 +94,7 @@ touch /$HOMEDIR/logs/{error.log,access.log}
 cat << EOT > $HOMEDIR/html/index.php
 <?php
 echo "Webcome to EchBay OpenLiteSpeed Hosting!";
+echo phpversion();
 ?>
 EOT
 

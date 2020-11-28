@@ -205,9 +205,9 @@ install_multi_PHP_version () {
 #	fi
 }
 #install_multi_PHP_version "71"
-#install_multi_PHP_version "72"
-#install_multi_PHP_version "73"
-#install_multi_PHP_version "74"
+install_multi_PHP_version "72"
+install_multi_PHP_version "73"
+install_multi_PHP_version "74"
 install_multi_PHP_version $php_version_install
 
 #Setting Up
