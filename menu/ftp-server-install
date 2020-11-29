@@ -85,6 +85,13 @@ iptables -I INPUT 2 -p udp --dport 30000:50000 -j ACCEPT
 iptables -I INPUT 2 -p tcp --dport 21 -j ACCEPT
 iptables -I INPUT 2 -p udp --dport 21 -j ACCEPT
 service iptables save
+
+if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then
+/sbin/service iptables restart
+#/sbin/service ip6tables restart
+else
+/bin/systemctl restart iptables.service
+fi
 #chown -R nginx:nginx /home
 
 #clear
