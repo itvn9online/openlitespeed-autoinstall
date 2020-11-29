@@ -40,6 +40,14 @@ exit
 fi
 fi
 
+#
+if [ -d $HOMEDIR ] || [ -d $SERVERROOT/conf/vhosts/$DOMAIN ]; then
+clear
+echo "Domain exist"
+/etc/echbay/menu/scripts/lscreate
+fi
+
+#
 if [ ! "$2" = "" ]; then
 	USERNAME=$2
 else
@@ -72,13 +80,6 @@ HOMEDIR="/home/$DOMAIN"
 
 SERVERROOT="/usr/local/lsws"
 DOMAINCONF="$SERVERROOT/conf/templates/$DOMAIN.conf"
-
-#
-if [ -d $HOMEDIR ] || [ -d $SERVERROOT/conf/vhosts/$DOMAIN ]; then
-clear
-echo "Domain exist"
-/etc/echbay/menu/scripts/lscreate
-fi
 
 # Create directory
 mkdir -p $HOMEDIR
