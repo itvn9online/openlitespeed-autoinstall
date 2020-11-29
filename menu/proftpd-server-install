@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Install Proftpd
+yum -y install proftpd
+sed -i "s/ProFTPD server/$HOSTNAME/g" /etc/proftpd.conf
+
+systemctl start proftpd
+systemctl enable proftpd

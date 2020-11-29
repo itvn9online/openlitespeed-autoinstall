@@ -1,4 +1,5 @@
 #!/bin/bash
+. /home/echbayols.conf
 
 if [ ! -f /etc/pure-ftpd/pure-ftpd.conf ]; then
 clear
@@ -34,17 +35,6 @@ echo "========================================================================="
 echo "$website co le khong phai la domain !"
 echo "-------------------------------------------------------------------------"
 echo "Ban vui long nhap lai  !"
-/etc/vpssim/menu/vpssim-ftpserver-menu
-exit
-fi
-
-if [ ! -f /etc/nginx/conf.d/$website.conf ]; then
-clear
-echo "========================================================================="
-echo "Website $website khong ton tai tren he thong!"
-echo "-------------------------------------------------------------------------"
-echo "Ban hay nhap lai !"
-/etc/vpssim/menu/vpssim-ftpserver-menu
 exit
 fi
 
@@ -61,8 +51,7 @@ echo "Thong tin tai khoan FTP:"
 echo "-------------------------------------------------------------------------"
 echo "IP: $serverip "
 echo "-------------------------------------------------------------------------"
-echo "User: $(grep "/home/$website/" /etc/vpssim/FTP-Account.info | awk 'NR==1 {print $7}') | Password: $(grep "/home/$website/" /etc/vpssim/FTP-Account.info | awk 'NR==1 {print $10}')"
-/etc/vpssim/menu/vpssim-ftpserver-menu
+echo "User: $(grep "/home/$website/" /etc/echbay/FTP-Account.info | awk 'NR==1 {print $7}') | Password: $(grep "/home/$website/" /etc/echbay/FTP-Account.info | awk 'NR==1 {print $10}')"
 fi
 
 
@@ -71,35 +60,35 @@ echo "Tim thay $website tren he thong"
 echo "-------------------------------------------------------------------------"
 echo "$website chua tao tai khoan FTP"
 echo "-------------------------------------------------------------------------"
-echo "VPSSIM se tao tai khoan FTP cho $website ngay bay gio"
+echo "ECHBAY se tao tai khoan FTP cho $website ngay bay gio"
 echo "-------------------------------------------------------------------------"
 echo "Please wait..."; sleep 6
 
 
-echo "$website" > /tmp/vpssimftp.txt
-sed -i '  s/\./_/g' /tmp/vpssimftp.txt
-sed -i 's/\-/_/g' /tmp/vpssimftp.txt
-username=`cat /tmp/vpssimftp.txt | sed "s/\_//" | sed "s/\_//" | sed "s/\_//" | sed "s/\_//" | cut -c1-30`
+echo "$website" > /tmp/echbayftp.txt
+sed -i '  s/\./_/g' /tmp/echbayftp.txt
+sed -i 's/\-/_/g' /tmp/echbayftp.txt
+username=`cat /tmp/echbayftp.txt | sed "s/\_//" | sed "s/\_//" | sed "s/\_//" | sed "s/\_//" | cut -c1-30`
 password=`date |md5sum |cut -c '3-23'`
 #useradd -m -d /home/$website -g nginx -p $password $username
 #usermod -aG nginx $username
 #chmod g+rxw /home/$website
 ( echo ${password} ; echo ${password} ) | pure-pw useradd $username -u nginx -g nginx -d /home/$website -m 
 pure-pw mkdb
-rm -rf /tmp/ftpvpssim.temp;
+rm -rf /tmp/echbayftp.txt;
 pure-pw mkdb
-if [ ! -f /etc/vpssim/FTP-Account.info ]; then
-echo "=========================================================================" > /etc/vpssim/FTP-Account.info
-echo "Please Do Not Delete This File " >> /etc/vpssim/FTP-Account.info
-echo "-------------------------------------------------------------------------" >> /etc/vpssim/FTP-Account.info
-echo "If you delete this file, VPSSIM will not run !" >> /etc/vpssim/FTP-Account.info
-echo "-------------------------------------------------------------------------" >> /etc/vpssim/FTP-Account.info
-echo "All FTP User for all domain on VPS list below:" >> /etc/vpssim/FTP-Account.info
-echo "=========================================================================" >> /etc/vpssim/FTP-Account.info
-echo "" >> /etc/vpssim/FTP-Account.info
+if [ ! -f /etc/echbay/FTP-Account.info ]; then
+echo "=========================================================================" > /etc/echbay/FTP-Account.info
+echo "Please Do Not Delete This File " >> /etc/echbay/FTP-Account.info
+echo "-------------------------------------------------------------------------" >> /etc/echbay/FTP-Account.info
+echo "If you delete this file, ECHBAY will not run !" >> /etc/echbay/FTP-Account.info
+echo "-------------------------------------------------------------------------" >> /etc/echbay/FTP-Account.info
+echo "All FTP User for all domain on VPS list below:" >> /etc/echbay/FTP-Account.info
+echo "=========================================================================" >> /etc/echbay/FTP-Account.info
+echo "" >> /etc/echbay/FTP-Account.info
 fi
 ################
-echo "FTP Account for $website | Username: $username | Password: $password | dd /home/$website/ " >> /etc/vpssim/FTP-Account.info
+echo "FTP Account for $website | Username: $username | Password: $password | dd /home/$website/ " >> /etc/echbay/FTP-Account.info
 clear
 echo "=========================================================================" 
 echo "Tao tai khoan FTP cho $website thanh cong"
@@ -109,4 +98,3 @@ echo "-------------------------------------------------------------------------"
 echo "IP: $serverip "
 echo "-------------------------------------------------------------------------"
 echo "User: $username | Password: $password"
-/etc/vpssim/menu/vpssim-ftpserver-menu

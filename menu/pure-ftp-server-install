@@ -75,9 +75,9 @@ chkconfig pure-ftpd on
 service pure-ftpd start
 service pure-ftpd restart
 else
-systemctl enable pure-ftpd 
-systemctl start pure-ftpd 
-systemctl restart pure-ftpd 
+systemctl enable pure-ftpd
+systemctl start pure-ftpd
+systemctl restart pure-ftpd
 fi
 
 if [ "`systemctl is-active firewalld.service`" == "active" ]; then

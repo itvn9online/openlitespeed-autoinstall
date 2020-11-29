@@ -48,6 +48,7 @@ echo "Domain exist"
 fi
 
 #
+get_username_password_ftp(){
 if [ ! "$2" = "" ]; then
 	USERNAME=$2
 else
@@ -63,6 +64,15 @@ if [ ! "$USERNAME" = "" ]; then
 		read PASSWORD
 	fi
 fi
+}
+
+# tu dong tao username ftp theo ten mien
+echo "$DOMAIN" > /tmp/echbayftp.txt
+sed -i '  s/\./_/g' /tmp/echbayftp.txt
+sed -i 's/\-/_/g' /tmp/echbayftp.txt
+USERNAME=`cat /tmp/echbayftp.txt | sed "s/\_//" | sed "s/\_//" | sed "s/\_//" | sed "s/\_//" | cut -c1-30`
+PASSWORD=`date |md5sum |cut -c '3-23'`
+rm -rf /tmp/echbayftp.txt
 
 #echo $DOMAIN
 #echo $USERNAME
@@ -174,19 +184,18 @@ echo "User: $username | Password: $password"
 if [ ! "$USERNAME" = "" ]; then
 
 if [ -f /etc/pure-ftpd/pure-ftpd.conf ]; then
-add_ftp_user_pure
+#add_ftp_user_pure
+/etc/echbay/menu/tao-ftp-user-cho-domain $DOMAIN
+chown -R lsadm:lsadm $HOMEDIR/html/
 elif [ -f /etc/proftpd.conf ]; then
 #/usr/sbin/useradd $USERNAME -d /home/$DOMAIN -p $(echo $PASSWORD | openssl passwd -1 -stdin) -M
 /usr/sbin/useradd $USERNAME -d $HOMEDIR -p $(echo $PASSWORD | openssl passwd -1 -stdin) -M
+chown -R $USERNAME:$USERNAME $HOMEDIR/html/
 fi
 
 fi
 
 # Fix Permission
-if [ ! "$USERNAME" = "" ]; then
-#chown -R $USERNAME:$USERNAME $HOMEDIR/html/
-chown -R lsadm:lsadm $HOMEDIR/html/
-fi
 chown -R lsadm:lsadm $SERVERROOT/conf/cert/
 chown -R lsadm:lsadm $SERVERROOT/conf/vhosts/
 chown -R lsadm:lsadm $SERVERROOT/conf/templates/

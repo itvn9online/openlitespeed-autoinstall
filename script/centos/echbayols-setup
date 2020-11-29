@@ -180,14 +180,6 @@ END
 rpm -ivh http://rpms.litespeedtech.com/centos/litespeed-repo-1.1-1.el${el_version}.noarch.rpm
 yum -y update
 
-# Install Proftpd
-install_proftpd(){
-echoG "Install proftpd"
-yum -y install proftpd
-sed -i "s/ProFTPD server/$HOSTNAME/g" /etc/proftpd.conf
-}
-#install_proftpd
-
 #Install Openlitespeed & MariaDB
 echoG "Install Openlitespeed & MariaDB"
 mkdir /home/echbayols.demo
@@ -347,9 +339,6 @@ openssl x509 -req -sha256 -days 365 -in $LSWSDIR/conf/cert/admin/admin.csr -sign
 
 #Setting MySQL
 systemctl start mariadb
-if [ -f /etc/proftpd.conf ]; then
-systemctl start proftpd
-fi
 $LSWSDIR/bin/lswsctrl start
 mysql -uroot -v -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
 mysql -uroot -v -e "DROP DATABASE test;"
@@ -365,17 +354,12 @@ EOT
 #ln -s /usr/local/lsws/lsphp72/bin/lsphp /usr/bin/php
 ln -s /usr/local/lsws/lsphp${php_version_install}/bin/lsphp /usr/bin/php
 
-if [ -f /etc/proftpd.conf ]; then
-systemctl enable proftpd
-fi
 systemctl enable mariadb
 
 
-# neu ftp chua duoc cai dat thi cai thoi
-if [ ! -f /etc/proftpd.conf ]; then
-echoG "Install pure ftpd"
-/opt/echbayols/menu/ftp-server-install
-fi
+# cai dat FTP server
+echoG "Install proftpd" ; /opt/echbayols/menu/proftpd-server-install
+#echoG "Install pure-ftpd" ; /opt/echbayols/menu/pure-ftp-server-install
 
 
 # change admin pass
