@@ -258,7 +258,7 @@ cat << EOT > /home/echbayols.demo/html/index.php
 <?php
 echo "Webcome to EchBay OpenLiteSpeed Hosting!";
 echo phpversion();
-echo __FILE__ . ':' . __LINE__;
+//echo __FILE__ . ':' . __LINE__;
 ?>
 EOT
 fi
