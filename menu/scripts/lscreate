@@ -183,7 +183,8 @@ fi
 
 # Fix Permission
 if [ ! "$USERNAME" = "" ]; then
-chown -R $USERNAME:$USERNAME $HOMEDIR/html/
+#chown -R $USERNAME:$USERNAME $HOMEDIR/html/
+chown -R lsadm:lsadm $HOMEDIR/html/
 fi
 chown -R lsadm:lsadm $SERVERROOT/conf/cert/
 chown -R lsadm:lsadm $SERVERROOT/conf/vhosts/
