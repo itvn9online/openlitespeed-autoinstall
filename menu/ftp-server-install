@@ -80,6 +80,14 @@ systemctl start pure-ftpd
 systemctl restart pure-ftpd 
 fi
 
+if [ "`systemctl is-active firewalld.service`" == "active" ]; then
+
+firewall-cmd --zone=public --permanent --add-port=21/tcp > /dev/null 2>&1
+firewall-cmd --zone=public --permanent --add-port=30000:50000/tcp > /dev/null 2>&1
+firewall-cmd --reload > /dev/null 2>&1
+
+else
+
 iptables -I INPUT 2 -p tcp --dport 30000:50000 -j ACCEPT
 iptables -I INPUT 2 -p udp --dport 30000:50000 -j ACCEPT
 iptables -I INPUT 2 -p tcp --dport 21 -j ACCEPT
@@ -92,6 +100,9 @@ if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6
 else
 /bin/systemctl restart iptables.service
 fi
+
+fi
+
 #chown -R nginx:nginx /home
 
 #clear
