@@ -131,39 +131,39 @@ openssl x509 -req -sha256 -days 365 -in $SERVERROOT/conf/cert/$DOMAIN/$DOMAIN.cs
 # Create FTP User -> PureFTPD
 add_ftp_user_pure(){
 
+user=$USERNAME
+passwd=$PASSWORD
+udir="/home/$USERNAME"
+dm_str_login="sbin/nologin"
+#ma_hoa_public_user_dir="8705079b8deaa02006a160f0342f05b0"
+#file_name_to_index_download="index"
+#domain="wp25882.s146.echbay.com"
+#dir_for_nginx_domain="/etc/nginx"
+#dm_id="25882"
+#dir_for_nginx_centmin_domain="/usr/local/nginx/conf"
+#act="process"
+
+#
+id -u $user
+if [ $? -eq 0 ]; then
+echo "user_exist"
+else
+#echo "user_does_not_exist"
+/usr/sbin/useradd $user
+/usr/sbin/usermod -d $udir $user
+echo $user:$passwd | /usr/sbin/chpasswd
+fi
+/usr/sbin/usermod -s /$dm_str_login $user
+if [ -f /etc/pure-ftpd/pure-ftpd.conf ]; then
 if [ ! -f /etc/pure-ftpd/pureftpd.passwd ]; then
 touch /etc/pure-ftpd/pureftpd.passwd
 fi
-
-website=$DOMAIN
-username=$USERNAME
-password=$PASSWORD
-
-( echo ${password} ; echo ${password} ) | pure-pw useradd $username -u lsadm -g lsadm -d /home/$website -m 
+if [ "$(pure-pw list | grep $udir)" == "" ]; then
+( echo ${passwd} ; echo ${passwd} ) | pure-pw useradd $user -u nginx -g nginx -d $udir -m
 pure-pw mkdb
 pure-pw mkdb
-
-if [ ! -f /etc/echbay/FTP-Account.info ]; then
-echo "=========================================================================" > /etc/echbay/FTP-Account.info
-echo "Please Do Not Delete This File " >> /etc/echbay/FTP-Account.info
-echo "-------------------------------------------------------------------------" >> /etc/echbay/FTP-Account.info
-echo "If you delete this file, ECHBAY will not run !" >> /etc/echbay/FTP-Account.info
-echo "-------------------------------------------------------------------------" >> /etc/echbay/FTP-Account.info
-echo "All FTP User for all domain on VPS list below:" >> /etc/echbay/FTP-Account.info
-echo "=========================================================================" >> /etc/echbay/FTP-Account.info
-echo "" >> /etc/echbay/FTP-Account.info
 fi
-################
-echo "FTP Account for $website | Username: $username | Password: $password | dd /home/$website/ " >> /etc/echbay/FTP-Account.info
-clear
-echo "=========================================================================" 
-echo "Tao tai khoan FTP cho $website thanh cong"
-echo "-------------------------------------------------------------------------"
-echo "Thong tin login:"
-echo "-------------------------------------------------------------------------"
-echo "IP: $serverip "
-echo "-------------------------------------------------------------------------"
-echo "User: $username | Password: $password"
+fi
 
 }
 
