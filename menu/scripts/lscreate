@@ -41,13 +41,6 @@ fi
 fi
 
 #
-if [ -d $HOMEDIR ] || [ -d $SERVERROOT/conf/vhosts/$DOMAIN ]; then
-clear
-echo "Domain exist"
-/etc/echbay/menu/scripts/lscreate
-fi
-
-#
 get_username_password_ftp(){
 if [ ! "$2" = "" ]; then
 	USERNAME=$2
@@ -90,6 +83,15 @@ HOMEDIR="/home/$DOMAIN"
 
 SERVERROOT="/usr/local/lsws"
 DOMAINCONF="$SERVERROOT/conf/templates/$DOMAIN.conf"
+
+#
+echo $HOMEDIR
+echo $SERVERROOT/conf/vhosts/$DOMAIN
+if [ -d $HOMEDIR ] || [ -d $SERVERROOT/conf/vhosts/$DOMAIN ]; then
+clear
+echo "Domain exist"
+/etc/echbay/menu/scripts/lscreate
+fi
 
 # Create directory
 mkdir -p $HOMEDIR

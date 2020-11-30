@@ -327,7 +327,33 @@ centos_firewall_add(){
 #firewall-cmd --zone=public --permanent --add-port=${svport}/tcp
 #firewall-cmd --zone=public --permanent --add-port=${phpmyadminport}/tcp
 #firewall-cmd --reload
+
+#
+systemctl mask firewalld
+systemctl stop firewalld
+yum -y install iptables*
+
+if [ -f /etc/sysconfig/iptables ]; then
+systemctl enable iptables 
+systemctl enable ip6tables
+systemctl start iptables
+systemctl start ip6tables
+systemctl start iptables.service
+
+for PORT in ${FIREWALLLIST}; do
+	if [ ! "$(iptables -L -n | grep :$PORT | awk 'NR==1 {print $1}')" == "ACCEPT" ]; then
+		iptables -I INPUT -p tcp --dport ${PORT} -j ACCEPT
+		iptables -I INPUT -p udp --dport ${PORT} -j ACCEPT
+	else
+		echo $PORT
+	fi
+done 
+
+/sbin/service iptables save
+/sbin/service iptables restart
+else
 centos_firewall_add
+fi
 
 # Generate SSL for Webadmin
 echoG "Generate SSL for Webadmin"

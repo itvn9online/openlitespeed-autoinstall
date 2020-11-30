@@ -89,12 +89,23 @@ firewall-cmd --zone=public --permanent --add-port=21/tcp
 firewall-cmd --zone=public --permanent --add-port=30000-50000/tcp
 firewall-cmd --reload
 
-else
+elif [ -f /etc/sysconfig/iptables ]; then
 
-iptables -I INPUT 2 -p tcp --dport 30000:50000 -j ACCEPT
-iptables -I INPUT 2 -p udp --dport 30000:50000 -j ACCEPT
-iptables -I INPUT 2 -p tcp --dport 21 -j ACCEPT
-iptables -I INPUT 2 -p udp --dport 21 -j ACCEPT
+#iptables -I INPUT 2 -p tcp --dport 30000:50000 -j ACCEPT
+#iptables -I INPUT 2 -p udp --dport 30000:50000 -j ACCEPT
+#iptables -I INPUT 2 -p tcp --dport 21 -j ACCEPT
+#iptables -I INPUT 2 -p udp --dport 21 -j ACCEPT
+
+FIREWALLLIST="21 30000:50000"
+for PORT in ${FIREWALLLIST}; do
+	if [ ! "$(iptables -L -n | grep :$PORT | awk 'NR==1 {print $1}')" == "ACCEPT" ]; then
+		iptables -I INPUT -p tcp --dport ${PORT} -j ACCEPT
+		iptables -I INPUT -p udp --dport ${PORT} -j ACCEPT
+	else
+		echo $PORT
+	fi
+done 
+
 /sbin/service iptables save
 
 if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then
