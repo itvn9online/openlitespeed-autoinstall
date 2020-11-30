@@ -83,9 +83,11 @@ fi
 
 if [ "`systemctl is-active firewalld.service`" == "active" ]; then
 
-firewall-cmd --zone=public --permanent --add-port=21/tcp > /dev/null 2>&1
-firewall-cmd --zone=public --permanent --add-port=30000:50000/tcp > /dev/null 2>&1
-firewall-cmd --reload > /dev/null 2>&1
+firewall-cmd --zone=public --permanent --add-port=21/udp
+firewall-cmd --zone=public --permanent --add-port=30000-50000/udp
+firewall-cmd --zone=public --permanent --add-port=21/tcp
+firewall-cmd --zone=public --permanent --add-port=30000-50000/tcp
+firewall-cmd --reload
 
 else
 
@@ -93,7 +95,7 @@ iptables -I INPUT 2 -p tcp --dport 30000:50000 -j ACCEPT
 iptables -I INPUT 2 -p udp --dport 30000:50000 -j ACCEPT
 iptables -I INPUT 2 -p tcp --dport 21 -j ACCEPT
 iptables -I INPUT 2 -p udp --dport 21 -j ACCEPT
-service iptables save
+/sbin/service iptables save
 
 if [ "$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))" == "6" ]; then
 /sbin/service iptables restart

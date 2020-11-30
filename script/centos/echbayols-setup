@@ -358,8 +358,8 @@ systemctl enable mariadb
 
 
 # cai dat FTP server
-echoG "Install proftpd" ; /opt/echbayols/menu/proftpd-server-install
-#echoG "Install pure-ftpd" ; /opt/echbayols/menu/pure-ftp-server-install
+#echoG "Install proftpd" ; /opt/echbayols/menu/proftpd-server-install
+echoG "Install pure-ftpd" ; /opt/echbayols/menu/pure-ftp-server-install
 
 
 # change admin pass
