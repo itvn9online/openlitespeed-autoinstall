@@ -2,6 +2,8 @@
 
 # Install Proftpd
 yum -y install proftpd
+#yum -y remove proftpd
+
 sed -i "s/ProFTPD server/$HOSTNAME/g" /etc/proftpd.conf
 
 systemctl start proftpd

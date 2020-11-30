@@ -12,6 +12,7 @@ echo "========================================================================= 
 echo "Chuan bi cai dat FTP Server... "
 sleep 3
 yum -y install pure-ftpd
+#yum -y remove pure-ftpd
 
 #
 if [ ! -f /etc/pure-ftpd/pure-ftpd.conf ]; then
