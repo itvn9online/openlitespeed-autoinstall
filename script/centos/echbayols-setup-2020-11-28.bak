@@ -1,0 +1,499 @@
+#!/bin/bash
+
+# function
+GITR_wget_to_copy() {
+yes | cp -rf $2 $1
+}
+
+echoY() {
+    echo -e "\033[38;5;148m${1}\033[39m"
+}
+echoG() {
+    echo -e "\033[38;5;71m${1}\033[39m"
+}
+echoR()
+{
+    echo -e "\033[38;5;203m${1}\033[39m"
+}
+
+# Random Password Generator
+passrootmysql=`date |md5sum |cut -c '1-15'`
+ROOTSQLPWD=$passrootmysql
+PMABLOWFISH=`date |md5sum |cut -c '1-32'`;
+
+# Define short code
+#GITRAW=https://raw.githubusercontent.com/tujuhion/openlitespeed-centos-autoinstall/master
+LSWSDIR=/usr/local/lsws
+GITRAW=/opt/echbayols
+mainsite="echbayols.demo"
+
+
+current_os_version=$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))
+if [ "$current_os_version" == "7" ]; then
+el_version=$current_os_version
+else
+el_version="8"
+fi
+
+phpmyadmin_version=`cat /opt/echbayols/00-all-phpmyadmin-version.txt`
+mariadbversion="10.2";
+phienbanmariadb=10.2
+
+#
+checktruenumber='^[0-9]+$'
+
+svport=7080
+phpmyadminport=8090
+
+kiemtraemail3="^(([-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~])+\.)*[-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~]+@\w((-|\w)*\w)*\.(\w((-|\w)*\w)*\.)*\w{2,24}$";
+svip=$(wget http://ipecho.net/plain -O - -q ; echo)
+cpuname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo )
+cpucores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
+cpufreq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo )
+svram=$( free -m | awk 'NR==2 {print $2}' )
+svhdd=$( df -h | awk 'NR==2 {print $2}' )
+svswap=$( free -m | awk 'NR==4 {print $2}' )
+free -m
+df -h
+echo "=========================================================================="
+echoG "Server info:"
+echo "--------------------------------------------------------------------------"
+echo "Server Type: $(virt-what | awk 'NR==1 {print $NF}')"
+echo "CPU Type: $cpuname"
+echo "CPU Core: $cpucores"
+echo "CPU Speed: $cpufreq MHz"
+echo "Memory: $svram MB"
+echo "Disk: $svhdd"
+echo "IP: $svip"
+#echo "--------------------------------------------------------------------------"
+#echo "Dien Thong Tin Cai Dat: "
+
+echo "=========================================================================="
+echo -n "Enter your email [ENTER]: " 
+read echbayolsemail
+if [ "$echbayolsemail" = "" ]; then
+clear
+echo "=========================================================================="
+echoY "Please enter your email!"
+echo "-------------------------------------------------------------------------"
+read -p "Press [Enter] to continue..."
+clear
+bash /root/echbayols-setup
+exit
+fi
+
+if [[ ! "$echbayolsemail" =~ $kiemtraemail3 ]]; then
+clear
+echo "=========================================================================="
+echo "ERROR! email format: $echbayolsemail"
+echo "--------------------------------------------------------------------------"
+read -p "Press [Enter] to continue..."
+clear
+bash /root/echbayols-setup
+exit
+fi
+
+matkhaubv=`date |md5sum |cut -c '1-12'`
+usernamebv=`echo "${echbayolsemail};" | sed 's/\([^@]*\)@\([^;.]*\)\.[^;]*;[ ]*/\1 \2\n/g' | awk 'NR==1 {print $1}'`
+
+rm -f /tmp/echbayols.conf
+cat > "/tmp/echbayols.conf" <<END
+matkhaubv="$matkhaubv"
+usernamebv="$usernamebv"
+passrootmysql="$passrootmysql"
+END
+
+echbayols_version=`cat /opt/echbayols/echbayols.newversion`
+php_version_install="72"
+#php_version_install="73"
+
+
+clear
+
+echo "=========================================================================="
+echoG "OS Version: "$current_os_version
+echo "--------------------------------------------------------------------------"
+echoY "ECHBAY-OLS will setup Server with info:"
+echo "=========================================================================="
+echo "Administrator E-Mail: $echbayolsemail"
+echo "--------------------------------------------------------------------------"
+echo "PHP Version: "$php_version_install
+echo "--------------------------------------------------------------------------"
+echo "phpMyAdmin Version: "$phpmyadmin_version
+echo "--------------------------------------------------------------------------"
+echo "MariaDB Version: $phienbanmariadb"
+echo "--------------------------------------------------------------------------"
+echo "MySQL root password: $passrootmysql"
+echo "--------------------------------------------------------------------------"
+echo "ECHBAY-OLS Version: $echbayols_version"
+echo "=========================================================================="
+
+echo -n "Confirm continue install (y/N): " 
+read xacnhanthongtin
+
+if [ "$xacnhanthongtin" = "y" ]; then
+clear
+#echo "--------------------------------------------------------------------------"
+echo "Waiting install ECHBAY-OLS..."
+sleep 2
+else 
+clear
+rm -rf /root/install && bash /root/echbayols-setup
+exit
+fi
+
+
+
+
+
+clear
+
+sed -i '/echbayolscheck/d' /root/.bash_profile
+cat >> "/root/.bash_profile" <<END
+IPechbayolscheck="\$(echo \$SSH_CONNECTION | cut -d " " -f 1)"
+timeloginechbayolscheck=\$(date +"%e %b %Y, %a %r")
+echo 'Someone has IP address '\$IPechbayolscheck' login to $svip on '\$timeloginechbayolscheck'.' | mail -s 'eMail Notifications From ECHBAY-OLS On $svip' ${echbayolsemail}
+END
+
+#
+echoG "Install certbot, mail..."
+yum -y install epel-release
+yum -y install certbot openssl
+sudo yum -y install sendmail sendmail-cf m4
+systemctl start sendmail.service
+systemctl enable sendmail.service
+
+sudo yum -y install exim syslog-ng cronie cronie-anacron
+
+# Update
+echoG "Update system, please wait..."
+#wget -O /etc/yum.repos.d/MariaDB.repo $GITRAW/repo/MariaDB.repo
+cat > "/etc/yum.repos.d/mariadb.repo" <<END
+# MariaDB $phienbanmariadb CentOS repository list 
+# http://downloads.mariadb.org/mariadb/repositories/
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/$phienbanmariadb/centos$el_version-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+END
+rpm -ivh http://rpms.litespeedtech.com/centos/litespeed-repo-1.1-1.el${el_version}.noarch.rpm
+yum -y update
+
+# Install Proftpd
+echoG "Install proftpd"
+yum -y install proftpd
+sed -i "s/ProFTPD server/$HOSTNAME/g" /etc/proftpd.conf
+
+#Install Openlitespeed & MariaDB
+echoG "Install Openlitespeed & MariaDB"
+mkdir /home/echbayols.demo
+mkdir /home/echbayols.demo/html
+mkdir /home/echbayols.demo/logs
+yum -y install openlitespeed
+yum -y install MariaDB-server MariaDB-client
+
+sleep 5
+
+# Install PHP
+echoG "Install PHP "$php_version_install
+#yum -y install lsphp72 lsphp72-common lsphp72-mysqlnd lsphp72-process lsphp72-gd lsphp72-mbstring lsphp72-mcrypt lsphp72-opcache lsphp72-bcmath lsphp72-pdo lsphp72-xml lsphp72-json lsphp72-zip lsphp72-xmlrpc lsphp72-pecl-mcrypt
+install_multi_PHP_version () {
+#	if [ ! -d /usr/local/lsws/lsphp${1} ]; then
+		sudo yum -y install lsphp${1} lsphp${1}-common lsphp${1}-mysqlnd lsphp${1}-process lsphp${1}-gd lsphp${1}-mbstring lsphp${1}-mcrypt lsphp${1}-opcache lsphp${1}-bcmath lsphp${1}-pdo lsphp${1}-xml lsphp${1}-json lsphp${1}-zip lsphp${1}-xmlrpc lsphp${1}-pecl-mcrypt
+#		sudo yum -y install lsphp${1} lsphp${1}-mysqlnd lsphp${1}-common lsphp${1}-gd lsphp${1}-pdo lsphp${1}-process lsphp${1}-mbstring lsphp${1}-mcrypt lsphp${1}-opcache lsphp${1}-bcmath lsphp${1}-xml
+#	fi
+}
+#install_multi_PHP_version "71"
+#install_multi_PHP_version "72"
+#install_multi_PHP_version "73"
+#install_multi_PHP_version "74"
+install_multi_PHP_version $php_version_install
+
+#Setting Up
+touch $LSWSDIR/domain
+mv -f $LSWSDIR/conf/vhosts/Example/ $LSWSDIR/conf/vhosts/echbayols.demo/
+rm -f $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf
+rm -f $LSWSDIR/conf/httpd_config.conf
+rm -f $LSWSDIR/admin/conf/admin_config.conf
+#wget -O $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf $GITRAW/conf/vhconf.conf
+GITR_wget_to_copy $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf $GITRAW/conf/vhconf.conf
+#wget -O $LSWSDIR/conf/httpd_config.conf $GITRAW/conf/httpd_config.conf
+GITR_wget_to_copy $LSWSDIR/conf/httpd_config.conf $GITRAW/conf/httpd_config.conf
+#wget -O $LSWSDIR/admin/conf/admin_config.conf $GITRAW/conf/admin_config.conf
+GITR_wget_to_copy $LSWSDIR/admin/conf/admin_config.conf $GITRAW/conf/admin_config.conf
+chown lsadm:lsadm $LSWSDIR/conf/vhosts/echbayols.demo/vhconf.conf
+chown lsadm:lsadm $LSWSDIR/conf/httpd_config.conf
+chown lsadm:lsadm $LSWSDIR/admin/conf/admin_config.conf
+
+
+# Copy Script
+#mkdir /scripts
+#wget -O /scripts/lscreate $GITRAW/scripts/lscreate
+#wget -O /scripts/lsremove $GITRAW/scripts/lsremove
+#wget -O /scripts/certbot $GITRAW/scripts/certbot
+#wget -O /scripts/createdb $GITRAW/scripts/createdb
+#wget -O /usr/bin/lsws $GITRAW/scripts/lsws
+#chmod +x /usr/bin/lsws
+#chmod +x /scripts/*
+
+
+#Copy Templates
+#wget -O $LSWSDIR/conf/templates/incl.conf $GITRAW/templates/incl.conf
+GITR_wget_to_copy $LSWSDIR/conf/templates/incl.conf $GITRAW/templates/incl.conf
+#wget -O $LSWSDIR/conf/templates/vhconf.conf $GITRAW/templates/vhconf.conf
+GITR_wget_to_copy $LSWSDIR/conf/templates/vhconf.conf $GITRAW/templates/vhconf.conf
+
+
+# Create Content in Homedir and logs
+touch /home/echbayols.demo/html/.htaccess
+touch /home/echbayols.demo/logs/{error.log,access.log}
+cat << EOT > /home/echbayols.demo/html/index.php
+<?php
+echo "Its Works!";
+?>
+EOT
+chown -R nobody:nobody /home/echbayols.demo/html/
+
+# Installing PHPMYAdmin
+echoG "Install PHPMYAdmin"
+mkdir $LSWSDIR/pma
+mkdir $LSWSDIR/pma/{html,logs}
+mkdir $LSWSDIR/conf/vhosts/pma
+mkdir $LSWSDIR/conf/cert/pma
+touch $LSWSDIR/pma/logs/error.log
+touch $LSWSDIR/pma/logs/access.log
+
+#wget -O $LSWSDIR/conf/vhosts/pma/vhconf.conf $GITRAW/conf/pma_vhconf.conf
+GITR_wget_to_copy $LSWSDIR/conf/vhosts/pma/vhconf.conf $GITRAW/conf/pma_vhconf.conf
+
+wget --no-check-certificate -O $LSWSDIR/pma/html/pma.tar.gz https://files.phpmyadmin.net/phpMyAdmin/${phpmyadmin_version}/phpMyAdmin-${phpmyadmin_version}-english.tar.gz
+cd $LSWSDIR/pma/html/
+tar -xzvf pma.tar.gz > /dev/null 2>&1
+mv phpMyAdmin-${phpmyadmin_version}-english/* ./
+
+# v2
+sed -e "s|cfg\['blowfish_secret'\] = ''|cfg['blowfish_secret'] = '$PMABLOWFISH'|" config.sample.inc.php > config.inc.php
+# v1
+#wget -O config.inc.php $GITRAW/conf/config.inc.php
+GITR_wget_to_copy config.inc.php $GITRAW/conf/config.inc.php
+sed -i "s/#BLOWFISH#/$PMABLOWFISH/g" config.inc.php
+
+mkdir tmp
+rm -f pma.tar.gz && rm -rf phpMyAdmin-${phpmyadmin_version}-english
+cd /
+chown -R lsadm:lsadm $LSWSDIR/pma/
+
+# Generate cerificare for PMA
+openssl genrsa -out $LSWSDIR/conf/cert/pma/pma.key 2048
+openssl rsa -in $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/cert/pma/pma.key
+openssl req -sha256 -new -key $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/cert/pma/pma.csr -subj "/CN=localhost"
+openssl x509 -req -sha256 -days 365 -in $LSWSDIR/conf/cert/pma/pma.csr -signkey $LSWSDIR/conf/cert/pma/pma.key -out $LSWSDIR/conf/cert/pma/pma.crt
+
+# Open port Needed in Firewall
+FIREWALLLIST="21 22 80 443 $svport $phpmyadminport"
+centos_firewall_check(){
+    firewall-cmd --list-all | grep ${1} > /dev/null 2>&1
+    if [ ${?} = 0 ]; then 
+        echoG 'firewalld rules setup success #'${1}
+    else 
+        echoR 'Please check firewalld rules'    
+    fi         
+}
+centos_firewall_add(){
+    echoG 'Setting Firewall'
+    if [ ! -e /usr/sbin/firewalld ]; then 
+        yum -y install firewalld > /dev/null 2>&1
+    fi
+    service firewalld start  > /dev/null 2>&1
+    systemctl enable firewalld > /dev/null 2>&1
+    for PORT in ${FIREWALLLIST}; do 
+        firewall-cmd --zone=public --permanent --add-port=${PORT}/tcp > /dev/null 2>&1
+    done 
+    firewall-cmd --reload > /dev/null 2>&1
+	centos_firewall_check $svport
+	centos_firewall_check $phpmyadminport
+#	firewall-cmd --list-all | grep 80 > /dev/null 2>&1
+#	if [ ${?} = 0 ]; then 
+#		echoG 'firewalld rules setup success'
+#	else 
+#		echoR 'Please check firewalld rules'    
+#	fi         
+}
+#firewall-cmd --zone=public --permanent --add-port=21/tcp
+#firewall-cmd --zone=public --permanent --add-port=80/tcp
+#firewall-cmd --zone=public --permanent --add-port=443/tcp
+#firewall-cmd --zone=public --permanent --add-port=${svport}/tcp
+#firewall-cmd --zone=public --permanent --add-port=${phpmyadminport}/tcp
+#firewall-cmd --reload
+centos_firewall_add
+
+# Generate SSL for Webadmin
+echoG "Generate SSL for Webadmin"
+mkdir $LSWSDIR/conf/cert/admin
+openssl genrsa -out $LSWSDIR/conf/cert/admin/admin.key 2048
+openssl rsa -in $LSWSDIR/conf/cert/admin/admin.key -out $LSWSDIR/conf/cert/admin/admin.key
+openssl req -sha256 -new -key $LSWSDIR/conf/cert/admin/admin.key -out $LSWSDIR/conf/cert/admin/admin.csr -subj "/CN=localhost"
+openssl x509 -req -sha256 -days 365 -in $LSWSDIR/conf/cert/admin/admin.csr -signkey $LSWSDIR/conf/cert/admin/admin.key -out $LSWSDIR/conf/cert/admin/admin.crt
+
+#Setting MySQL
+systemctl start mariadb && systemctl start proftpd && $LSWSDIR/bin/lswsctrl start
+mysql -uroot -v -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+mysql -uroot -v -e "DROP DATABASE test;"
+mysql -uroot -v -e "DELETE FROM mysql.user WHERE User='';"
+mysql -uroot -v -e "use mysql;update user set Password=PASSWORD('$ROOTSQLPWD') where user='root'; flush privileges;"
+
+# Save Password root MariaDB
+cat << EOT > /root/.MariaDB
+$ROOTSQLPWD
+EOT
+
+# Create PHP symlink
+#ln -s /usr/local/lsws/lsphp72/bin/lsphp /usr/bin/php
+ln -s /usr/local/lsws/lsphp${php_version_install}/bin/lsphp /usr/bin/php
+
+systemctl enable proftpd
+systemctl enable mariadb
+
+
+# change admin pass
+#/usr/local/lsws/admin/misc/admpass.sh
+yes | cp -rf /opt/echbayols/menu/auto_lsws_admpass /usr/local/lsws/admin/misc/auto_lsws_admpass
+chmod +x /usr/local/lsws/admin/misc/auto_lsws_admpass
+bash /usr/local/lsws/admin/misc/auto_lsws_admpass
+rm -rf /usr/local/lsws/admin/misc/auto_lsws_admpass
+
+# fxibug
+mkdir -p /var/lib/php/session
+chown -R lsadm:lsadm /var/lib/php
+chmod 777 /var/lib/php/session
+chmod 777 $LSWSDIR/pma/html/tmp
+
+# for calc
+yum -y install bc > /dev/null 2>&1
+
+
+clear
+echoG "Dang Tao ECHBAY-OLS Menu...... "
+sleep 2
+
+rm -rf /etc/motd
+yes | cp -rf $GITRAW/motd /etc/motd
+
+# Download echbay_main_menu
+yes | cp -rf $GITRAW/echbay /bin/echbay && chmod +x /bin/echbay
+
+mkdir -p /etc/echbay
+
+mkdir -p /etc/echbay/menu ; chmod 755 /etc/echbay/menu
+yes | cp -rf $GITRAW/menu/. /etc/echbay/menu/
+
+/opt/echbayols/menu/chmod-755-menu
+
+cat > "/etc/echbay/echbayols.version" <<END
+${echbayols_version}
+END
+
+cat > "/etc/echbay/phpmyadmin.version" <<END
+${phpmyadmin_version}
+END
+
+if [ ! "$(grep LANG=en_US.utf-8 /etc/environment)" == "LANG=en_US.utf-8" ]; then
+cat > "/etc/environment" <<END
+LANG=en_US.utf-8
+LC_ALL=en_US.utf-8
+END
+fi
+
+rm -f /home/echbayols.conf
+cat > "/home/echbayols.conf" <<END
+mainsite="$mainsite"
+priport="$svport"
+phpadport="$phpmyadminport"
+serverip="$svip"
+mariadbpass="$passrootmysql"
+FIREWALLLIST="$FIREWALLLIST"
+END
+
+
+
+# increase SSH login speed
+if [ -f /etc/ssh/sshd_config ]; then 
+sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_config
+sed -i 's/#UseDNS yes/UseDNS no/g' /etc/ssh/sshd_config
+fi
+#Change default folder ssh login
+#if [ -f /root/.bash_profile ]; then
+#sed -i "/.*#\ .bash_profile.*/acd /home" /root/.bash_profile
+#fi
+
+
+
+cat >> "/home/ECHBAY-manage-info.txt" <<END
+=========================================================================
+                           VPS MANAGE INFOMATION                         
+=========================================================================
+
++ Lenh goi ECHBAY-OLS: echbay
+
++ Link phpMyAdmin: http://$svip:$phpmyadminport
+--- MySQL root Password: $passrootmysql
+
++ Open LiteSpeed control panel: http://$svip:$svport
+--- Username: $usernamebv
+--- Password: $matkhaubv
+
+Chuc ban se thanh cong cung ECHBAY-OLS.
+
+ECHBAY-OLS by Dao Quoc Dai - https://echbay.com
+END
+
+
+cat > "/tmp/finishedemail.sh" <<END
+#!/bin/bash 
+echo -e 'Subject: ECHBAY-OLS - Chuc mung cai dat thanh cong $svip!
+
+Chao ban!
+
+Chuc mung ban da hoan thanh qua trinh cai dat va cau hinh server $svip bang ECHBAY-OLS. Sau day la thong tin quan ly server cua ban:
+
++ Lenh goi ECHBAY-OLS: echbay
+
++ Link phpMyAdmin: http://$svip:$phpmyadminport
+--- MySQL root Password: $passrootmysql
+
++ Open LiteSpeed control panel: http://$svip:$svport
+--- Username: $usernamebv  
+--- Password: $matkhaubv 
+  
+ECHBAY-OLS by Dao Quoc Dai - https://echbay.com' | exim  $echbayolsemail
+END
+chmod +x /tmp/finishedemail.sh
+/tmp/finishedemail.sh
+rm -f /tmp/finishedemail.sh
+
+
+clear
+echo "=========================================================================="
+echoG "ECHBAY-OLS da hoan tat qua trinh cai dat Server. "
+echo "=========================================================================="
+echo "Call ECHBAY-OLS: echbay"
+echo "--------------------------------------------------------------------------"
+echo "WebAdmin: https://$svip:$svport"
+echo "Username: $usernamebv"
+echo "Password: $matkhaubv"
+echo "--------------------------------------------------------------------------"
+echo "Link phpMyAdmin: https://$svip:$phpmyadminport"
+echo "MySQL root Password: $passrootmysql"
+echo "=========================================================================="
+echo "All control info save in: /home/echbayols-manage-info.txt "
+echo "--------------------------------------------------------------------------"
+echo "and send email to: $echbayolsemail"
+echo "=========================================================================="
+echo "Server auto restart after 3 second... "
+sleep 3
+reboot
+exit
+
+
+
