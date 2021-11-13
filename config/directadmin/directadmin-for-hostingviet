@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# for openlitespeed
+cd ~
+if [ -f /usr/local/lsws/bin/lswsctrl ]; then
+	# bổ sung các file config thiếu nếu chưa có
+	
+	
+	# xác nhận có rebuil
+	for_rebuild="no"
+	
+	
+	# for mod_headers
+	# https://www.vpsbasics.com/cp/how-to-add-http-security-headers-with-openlitespeed-and-directadmin/
+	if [ ! -f /usr/local/directadmin/data/templates/custom/openlitespeed_vhost.conf.CUSTOM.3.pre ]; then
+		mkdir -p /usr/local/directadmin/data/templates/custom
+		cd /usr/local/directadmin/data/templates/custom
+		wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/openlitespeed_vhost.conf.CUSTOM.3.txt" -O openlitespeed_vhost.conf.CUSTOM.3.pre ; chmod 644 openlitespeed_vhost.conf.CUSTOM.3.pre
+		cd ~
+		
+		for_rebuild="yes"
+	fi
+	
+	if [ ! -f /usr/local/directadmin/data/templates/custom/openlitespeed_vhost.conf ]; then
+		mkdir -p /usr/local/directadmin/data/templates/custom
+		cd /usr/local/directadmin/data/templates/custom
+		wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/openlitespeed_vhost.txt" -O openlitespeed_vhost.conf ; chmod 644 openlitespeed_vhost.conf
+		cd ~
+		
+		for_rebuild="yes"
+	fi
+
+	
+	# for mod_expires
+	# https://www.vpsbasics.com/cp/how-to-change-default-browser-cache-settings-with-openlitespeed-and-directadmin/
+	if [ ! -f /usr/local/directadmin/custombuild/custom/openlitespeed/conf/httpd-expires.conf ]; then
+		mkdir -p /usr/local/directadmin/custombuild/custom/openlitespeed/conf
+		cd /usr/local/directadmin/custombuild/custom/openlitespeed/conf
+		wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/httpd-expires.txt" -O httpd-expires.conf ; chmod 644 httpd-expires.conf
+		cd ~
+		
+		for_rebuild="yes"
+	fi
+	
+	#
+	if [ "$for_rebuild" = "yes" ]; then
+		cd /usr/local/directadmin/custombuild
+		./build rewrite_confs
+		cd ~
+	fi
+	
+	
+	# restart OLS
+	/usr/local/lsws/bin/lswsctrl restart
+fi
+
+#
+cd ~
