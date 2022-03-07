@@ -1,0 +1,62 @@
+#!/bin/bash
+
+#
+cd ~
+
+#
+if [ ! -d /usr/local/directadmin/scripts/custom ]; then
+echo "Dir directadmin custom not found!"
+exit
+fi
+
+#
+yum -y update
+yum -y upgrade
+
+# add port for redis (lệnh dùng chung cho cả 2 cách)
+if [ -f /etc/sysconfig/iptables ]; then
+echo "Add port 6379 to iptables"
+iptables -I INPUT -p tcp --dport 6379 -j ACCEPT
+iptables -I INPUT -p udp --dport 6379 -j ACCEPT
+/sbin/service iptables save
+/sbin/service iptables restart
+else
+echo "iptables not install"
+fi
+
+# EPEL repository:
+yum -y install epel-release
+# Install Redis:
+yum -y install redis
+
+#
+systemctl enable redis ; systemctl start redis; systemctl status redis
+sleep 5;
+
+#
+cd /usr/local/php74/bin
+./pecl install igbinary igbinary-devel
+#
+./pecl install redis
+
+#
+cd ~
+
+# show php extension dir
+php-config --extension-dir
+sleep 5;
+
+#
+cd /usr/local/directadmin/scripts/custom
+wget https://raw.githubusercontent.com/poralix/directadmin-utils/master/php/php-extension.sh -O php-extension.sh
+chmod 750 php-extension.sh
+./php-extension.sh
+sleep 5;
+
+#
+./php-extension.sh install redis
+./php-extension.sh status redis
+sleep 5;
+
+#
+service litespeed restart
