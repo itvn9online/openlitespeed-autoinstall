@@ -44,7 +44,7 @@ cd ~
 
 # show php extension dir
 php-config --extension-dir
-sleep 5;
+#sleep 5;
 
 #
 cd /usr/local/directadmin/scripts/custom
