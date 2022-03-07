@@ -34,10 +34,10 @@ systemctl enable redis ; systemctl start redis; systemctl status redis
 sleep 5;
 
 #
-cd /usr/local/php74/bin
-./pecl install igbinary igbinary-devel
+#cd /usr/local/php74/bin
+#./pecl install igbinary igbinary-devel
 #
-./pecl install redis
+#./pecl install redis
 
 #
 cd ~
