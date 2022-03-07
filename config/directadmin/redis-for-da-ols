@@ -46,7 +46,7 @@ cd ~
 php-config --extension-dir
 #sleep 5;
 
-#
+# https://help.poralix.com/articles/install-pecl-extension-for-php-directadmin-server
 cd /usr/local/directadmin/scripts/custom
 wget https://raw.githubusercontent.com/poralix/directadmin-utils/master/php/php-extension.sh -O php-extension.sh
 chmod 750 php-extension.sh
