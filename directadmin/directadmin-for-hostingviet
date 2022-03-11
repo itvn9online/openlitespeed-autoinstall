@@ -3,13 +3,24 @@
 # for openlitespeed
 cd ~
 if [ -f /usr/local/lsws/bin/lswsctrl ]; then
-	
+
+#
+echo -n "Ban co muon giau thong tin nha phat trien khong? [y/n]: " 
+read hideProvided
+if [ "$hideProvided" = "y" ]; then
+# download file no Provided-By
+link_custom3="openlitespeed_vhost.conf.CUSTOM.3-no-Provided"
+else
+# download file has Provided-By
+link_custom3="openlitespeed_vhost.conf.CUSTOM.3"
+fi
+
 	# for mod_headers
 	# https://www.vpsbasics.com/cp/how-to-add-http-security-headers-with-openlitespeed-and-directadmin/
 	mkdir -p /usr/local/directadmin/data/templates/custom
 	cd /usr/local/directadmin/data/templates/custom
 	
-	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/data/templates/custom/openlitespeed_vhost.conf.CUSTOM.3.txt" -O openlitespeed_vhost.conf.CUSTOM.3.pre ; chmod 755 openlitespeed_vhost.conf.CUSTOM.3.pre
+	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/data/templates/custom/$link_custom3.txt" -O openlitespeed_vhost.conf.CUSTOM.3.pre ; chmod 755 openlitespeed_vhost.conf.CUSTOM.3.pre
 	
 	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/data/templates/custom/openlitespeed_vhost.txt" -O openlitespeed_vhost.conf ; chmod 755 openlitespeed_vhost.conf
 	

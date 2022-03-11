@@ -1,0 +1,35 @@
+# for openlitespeed
+# https://www.vpsbasics.com/cp/how-to-add-http-security-headers-with-openlitespeed-and-directadmin/
+# https://securityheaders.com/
+
+
+context / {
+	location      $DOC_ROOT/
+	allowBrowse     1
+	extraHeaders   Strict-Transport-Security: max-age=63072000; includeSubdomains; preload
+}
+context / {
+	location       $DOC_ROOT/
+	allowBrowse    1
+	extraHeaders    X-XSS-Protection 1; mode=block
+}
+context / {
+	location    $DOC_ROOT/
+	allowBrowse    1
+	extraHeaders  X-Frame-Options SAMEORIGIN
+}
+context / {
+	location        $DOC_ROOT/
+	allowBrowse     1
+	extraHeaders   X-Content-Type-Options nosniff
+}
+context / {
+	location      $DOC_ROOT/
+	allowBrowse   1
+	extraHeaders   Referrer-Policy strict-origin-when-cross-origin
+}
+context / {
+	location     $DOC_ROOT/
+	allowBrowse   1
+	extraHeaders  Expect-CT enforce, max-age=21600
+}
