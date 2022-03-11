@@ -9,9 +9,9 @@ if [ -f /usr/local/lsws/bin/lswsctrl ]; then
 	mkdir -p /usr/local/directadmin/data/templates/custom
 	cd /usr/local/directadmin/data/templates/custom
 	
-	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/data/templates/custom/openlitespeed_vhost.conf.CUSTOM.3.txt" -O openlitespeed_vhost.conf.CUSTOM.3.pre ; chmod 755 openlitespeed_vhost.conf.CUSTOM.3.pre
+	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/data/templates/custom/openlitespeed_vhost.conf.CUSTOM.3.txt" -O openlitespeed_vhost.conf.CUSTOM.3.pre ; chmod 755 openlitespeed_vhost.conf.CUSTOM.3.pre
 	
-	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/data/templates/custom/openlitespeed_vhost.txt" -O openlitespeed_vhost.conf ; chmod 755 openlitespeed_vhost.conf
+	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/data/templates/custom/openlitespeed_vhost.txt" -O openlitespeed_vhost.conf ; chmod 755 openlitespeed_vhost.conf
 	
 	
 	# for mod_expires
@@ -19,7 +19,7 @@ if [ -f /usr/local/lsws/bin/lswsctrl ]; then
 	cd ~
 	mkdir -p /usr/local/directadmin/custombuild/custom/openlitespeed/conf
 	cd /usr/local/directadmin/custombuild/custom/openlitespeed/conf
-	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/config/directadmin/custombuild/custom/openlitespeed/conf/httpd-expires.txt" -O httpd-expires.conf ; chmod 755 httpd-expires.conf
+	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/custombuild/custom/openlitespeed/conf/httpd-expires.txt" -O httpd-expires.conf ; chmod 755 httpd-expires.conf
 	
 	cd ~
 	cd /usr/local/directadmin/custombuild
