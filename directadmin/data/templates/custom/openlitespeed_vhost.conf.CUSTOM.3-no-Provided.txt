@@ -6,6 +6,16 @@
 context / {
 	location      $DOC_ROOT/
 	allowBrowse     1
+	extraHeaders   X-Server-Secured-By EB
+}
+context / {
+	location      $DOC_ROOT/
+	allowBrowse     1
+	extraHeaders   X-Code-Provided-By WGR
+}
+context / {
+	location      $DOC_ROOT/
+	allowBrowse     1
 	extraHeaders   Strict-Transport-Security: max-age=63072000; includeSubdomains; preload
 }
 context / {
