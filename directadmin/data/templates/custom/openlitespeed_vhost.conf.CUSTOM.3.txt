@@ -53,11 +53,13 @@ context / {
     allowBrowse   1
     extraHeaders  Content-Security-Policy default-src https:; font-src https: data:; img-src https: data:; script-src https:; style-src https:;
 }
+|*if SSL_TEMPLATE="1"|
 context / {
     location    $DOC_ROOT/
     allowBrowse    1
     extraHeaders  Permissions-Policy 'geolocation=*, midi=(), sync-xhr=(self "https://|DOMAIN|" "https://www.|DOMAIN|"), microphone=(), camera=(), magnetometer=(), gyroscope=(), payment=(), fullscreen=(self "https://|DOMAIN|" "https://www.|DOMAIN|")'
 }
+|*endif|
 
 # https://openlitespeed.org/kb/how-to-set-up-custom-headers/
 # https://cleanleaf.com/docs/LSAPI_Context.html#location
