@@ -43,16 +43,6 @@ context / {
 	allowBrowse   1
 	extraHeaders  Expect-CT enforce, max-age=21600
 }
-context / {
-    location    $DOC_ROOT/
-    allowBrowse    1
-    extraHeaders  Feature-Policy geolocation 'self'; vibrate 'none'
-}
-context / {
-    location    $DOC_ROOT/
-    allowBrowse   1
-    extraHeaders  Content-Security-Policy default-src https:; font-src https: data:; img-src https: data:; script-src https:; style-src https:;
-}
 
 #
 |*if SSL_TEMPLATE="1"|
