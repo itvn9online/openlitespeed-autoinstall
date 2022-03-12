@@ -1,8 +1,6 @@
-# for openlitespeed -> add |CUSTOM3| to |CONTEXTS| AND |REALMS|
-#|CONTEXTS|
-#|CUSTOM3|
-#|REALMS|
-
+#
+# for openlitespeed -> add CUSTOM3 to CONTEXTS AND REALMS
+#
 # https://www.vpsbasics.com/cp/how-to-add-http-security-headers-with-openlitespeed-and-directadmin/
 # https://securityheaders.com/
 
