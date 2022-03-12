@@ -4,30 +4,42 @@
 cd ~
 if [ -f /usr/local/lsws/bin/lswsctrl ]; then
 
-	# for mod_headers
-	# https://www.vpsbasics.com/cp/how-to-add-http-security-headers-with-openlitespeed-and-directadmin/
-	mkdir -p /usr/local/directadmin/data/templates/custom
-	cd /usr/local/directadmin/data/templates/custom
-	
-	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/data/templates/custom/openlitespeed_vhost.conf.CUSTOM.3.txt" -O openlitespeed_vhost.conf.CUSTOM.3.pre ; chmod 755 openlitespeed_vhost.conf.CUSTOM.3.pre
-	
-	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/data/templates/custom/openlitespeed_vhost.txt" -O openlitespeed_vhost.conf ; chmod 755 openlitespeed_vhost.conf
-	
-	
-	# for mod_expires
-	# https://www.vpsbasics.com/cp/how-to-change-default-browser-cache-settings-with-openlitespeed-and-directadmin/
-	cd ~
-	mkdir -p /usr/local/directadmin/custombuild/custom/openlitespeed/conf
-	cd /usr/local/directadmin/custombuild/custom/openlitespeed/conf
-	wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/custombuild/custom/openlitespeed/conf/httpd-expires.txt" -O httpd-expires.conf ; chmod 755 httpd-expires.conf
-	
-	cd ~
-	cd /usr/local/directadmin/custombuild
-	./build rewrite_confs
-	
-	# restart OLS
-	cd ~
-	/usr/local/lsws/bin/lswsctrl restart
+# for mod_headers
+# https://www.vpsbasics.com/cp/how-to-add-http-security-headers-with-openlitespeed-and-directadmin/
+mkdir -p /usr/local/directadmin/data/templates/custom
+cd /usr/local/directadmin/data/templates/custom
+
+wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/data/templates/custom/openlitespeed_vhost.conf.CUSTOM.3.txt" -O openlitespeed_vhost.conf.CUSTOM.3.pre
+
+wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/data/templates/custom/openlitespeed_vhost.txt" -O openlitespeed_vhost.conf
+
+
+# for mod_expires
+# https://www.vpsbasics.com/cp/how-to-change-default-browser-cache-settings-with-openlitespeed-and-directadmin/
+cd ~
+mkdir -p /usr/local/directadmin/custombuild/custom/openlitespeed/conf
+cd /usr/local/directadmin/custombuild/custom/openlitespeed/conf
+wget --no-check-certificate -q "https://raw.githubusercontent.com/itvn9online/openlitespeed-autoinstall/main/directadmin/custombuild/custom/openlitespeed/conf/httpd-expires.txt" -O httpd-expires.conf
+
+cd ~
+
+#
+chown diradmin:diradmin /usr/local/directadmin/data/templates/custom
+chown diradmin:diradmin /usr/local/directadmin/data/templates/custom/*
+chmod 755 /usr/local/directadmin/data/templates/custom/*
+
+chown diradmin:diradmin /usr/local/directadmin/custombuild/custom/openlitespeed/conf
+chown diradmin:diradmin /usr/local/directadmin/custombuild/custom/openlitespeed/conf/*
+chmod 755 /usr/local/directadmin/custombuild/custom/openlitespeed/conf/*
+
+#
+cd /usr/local/directadmin/custombuild
+./build rewrite_confs
+
+# restart OLS
+cd ~
+/usr/local/lsws/bin/lswsctrl restart
+
 fi
 
 #
