@@ -43,3 +43,11 @@ context / {
 	allowBrowse   1
 	extraHeaders  Expect-CT enforce, max-age=21600
 }
+# https://openlitespeed.org/kb/how-to-set-up-custom-headers/
+# https://cleanleaf.com/docs/LSAPI_Context.html#location
+context / {
+	location     $DOC_ROOT/$0
+	allowBrowse   1
+	URI exp:^.*(woff|woff2|jpg|jpeg|png|css|js)$
+	extraHeaders  Access-Control-Allow-Origin *
+}
