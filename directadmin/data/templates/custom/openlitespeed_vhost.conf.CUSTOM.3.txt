@@ -69,3 +69,20 @@ context / {
 #	uri exp:^.*(woff|woff2|jpg|jpeg|png|css|js)$
 #	extraHeaders  Access-Control-Allow-Origin *
 #}
+
+# https://openlitespeed.org/kb/setting-up-cors-on-openlitespeed/
+#context / {
+#	location				$DOC_ROOT/
+#	allowBrowse				1
+#	extraHeaders			Access-Control-Allow-Origin *
+#	Access-Control-Allow-Methods	GET
+#	#Access-Control-Allow-Methods	GET, POST, OPTIONS, DELETE
+#
+#	rewrite  {
+#		RewriteFile .htaccess
+#	}
+#	addDefaultCharset		off
+#
+#	phpIniOverride  {
+#	}
+#}
