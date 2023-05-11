@@ -60,8 +60,8 @@ sleep 5;
 
 #
 if [ -f /usr/local/lsws/bin/lswsctrl ]; then
-#/usr/local/lsws/bin/lswsctrl restart
-service litespeed restart
+/usr/local/lsws/bin/lswsctrl restart
+#service litespeed restart
 else
 service nginx restart
 fi
