@@ -38,8 +38,9 @@ context / {
 	allowBrowse   1
 	extraHeaders   Referrer-Policy strict-origin-when-cross-origin
 }
-context / {
-	location     $DOC_ROOT/
-	allowBrowse   1
-	extraHeaders  Expect-CT enforce, max-age=21600
-}
+# The `Expect-CT` header is deprecated and will be removed. Chrome requires Certificate Transparency for all publicly trusted certificates issued after April 30, 2018.
+#context / {
+#	location     $DOC_ROOT/
+#	allowBrowse   1
+#	extraHeaders  Expect-CT enforce, max-age=21600
+#}
