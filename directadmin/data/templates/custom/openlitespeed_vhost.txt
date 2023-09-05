@@ -58,6 +58,10 @@ virtualHost |SDOMAIN|-|VH_PORT| {
 |*if SUB|
 |?DOCROOT=`SDOCROOT`|
 |*endif|
+
+# |DOCROOT|
+# |SDOCROOT|
+
   user                    |USER|
   group                   |GROUP|
   vhRoot                  |VHROOT|
