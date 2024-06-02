@@ -50,13 +50,13 @@ context / {
 context / {
 	location    $DOC_ROOT/
 	allowBrowse    1
-	extraHeaders  Permissions-Policy 'geolocation=*, midi=(), sync-xhr=(self "https://|SDOMAIN|" "https://www.|SDOMAIN|"), microphone=(), camera=(), magnetometer=(), gyroscope=(), payment=(), fullscreen=(self "https://|SDOMAIN|" "https://www.|SDOMAIN|")'
+	extraHeaders  Permissions-Policy 'geolocation=*, midi=(), sync-xhr=(self "https://|SDOMAIN|" "https://www.|SDOMAIN|"), microphone=(self "https://|SDOMAIN|" "https://www.|SDOMAIN|"), camera=(self "https://|SDOMAIN|" "https://www.|SDOMAIN|"), magnetometer=(), gyroscope=(), payment=(), fullscreen=(self "https://|SDOMAIN|" "https://www.|SDOMAIN|")'
 }
 |*else|
 context / {
 	location    $DOC_ROOT/
 	allowBrowse    1
-	extraHeaders  Permissions-Policy 'geolocation=*, midi=(), sync-xhr=(self "http://|SDOMAIN|" "http://www.|SDOMAIN|"), microphone=(), camera=(), magnetometer=(), gyroscope=(), payment=(), fullscreen=(self "http://|SDOMAIN|" "http://www.|SDOMAIN|")'
+	extraHeaders  Permissions-Policy 'geolocation=*, midi=(), sync-xhr=(self "http://|SDOMAIN|" "http://www.|SDOMAIN|"), microphone=(self "https://|SDOMAIN|" "https://www.|SDOMAIN|"), camera=(self "https://|SDOMAIN|" "https://www.|SDOMAIN|"), magnetometer=(), gyroscope=(), payment=(), fullscreen=(self "http://|SDOMAIN|" "http://www.|SDOMAIN|")'
 }
 |*endif|
 
